@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rankly Dashboard</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'Helvetica Neue', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        background: 'hsl(0 0% 100%)',
+                        foreground: 'hsl(0 0% 0%)',
+                        card: 'hsl(0 0% 100%)',
+                        'card-foreground': 'hsl(0 0% 0%)',
+                        popover: 'hsl(0 0% 100%)',
+                        'popover-foreground': 'hsl(0 0% 0%)',
+                        primary: 'hsl(0 0% 0%)',
+                        'primary-foreground': 'hsl(0 0% 100%)',
+                        secondary: 'hsl(0 0% 96%)',
+                        'secondary-foreground': 'hsl(0 0% 0%)',
+                        muted: 'hsl(0 0% 96%)',
+                        'muted-foreground': 'hsl(0 0% 45%)',
+                        accent: 'hsl(0 0% 96%)',
+                        'accent-foreground': 'hsl(0 0% 0%)',
+                        destructive: 'hsl(0 0% 0%)',
+                        'destructive-foreground': 'hsl(0 0% 100%)',
+                        border: 'hsl(0 0% 90%)',
+                        input: 'hsl(0 0% 90%)',
+                        ring: 'hsl(0 0% 0%)',
+                        radius: '0.5rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .dark {
+            --background: 0 0% 0%;
+            --foreground: 0 0% 100%;
+            --card: 0 0% 0%;
+            --card-foreground: 0 0% 100%;
+            --popover: 0 0% 0%;
+            --popover-foreground: 0 0% 100%;
+            --primary: 0 0% 100%;
+            --primary-foreground: 0 0% 0%;
+            --secondary: 0 0% 15%;
+            --secondary-foreground: 0 0% 100%;
+            --muted: 0 0% 15%;
+            --muted-foreground: 0 0% 65%;
+            --accent: 0 0% 15%;
+            --accent-foreground: 0 0% 100%;
+            --destructive: 0 0% 100%;
+            --destructive-foreground: 0 0% 0%;
+            --border: 0 0% 20%;
+            --input: 0 0% 20%;
+            --ring: 0 0% 100%;
+        }
+
+        body {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+        }
+
+        /* ShadCN Typography */
+        .typography-h1 {
+            scroll-margin: 5rem;
+            font-size: 2.25rem;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.025em;
+        }
+
+        .typography-h2 {
+            scroll-margin: 5rem;
+            font-size: 1.875rem;
+            font-weight: 600;
+            line-height: 1.3;
+            letter-spacing: -0.025em;
+        }
+
+        .typography-h3 {
+            scroll-margin: 5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.3;
+            letter-spacing: -0.025em;
+        }
+
+        .typography-p {
+            line-height: 1.75;
+            margin-top: 1.5rem;
+        }
+
+        .typography-muted {
+            font-size: 0.875rem;
+            color: hsl(var(--muted-foreground));
+        }
+
+        /* ShadCN Components */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1px solid hsl(var(--border));
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: hsl(var(--accent));
+        }
+
+        .btn-primary {
+            background-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            border-color: hsl(var(--primary));
+        }
+
+        .btn-primary:hover {
+            background-color: hsl(var(--primary) / 0.9);
+        }
+
+        .card {
+            background-color: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+        }
+
+        .input {
+            display: flex;
+            height: 2.5rem;
+            width: 100%;
+            border-radius: 0.5rem;
+            border: 1px solid hsl(var(--border));
+            background-color: hsl(var(--background));
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: hsl(var(--ring));
+            box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+        }
+
+        .tabs-trigger {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            color: hsl(var(--muted-foreground));
+        }
+
+        .tabs-trigger:hover {
+            color: hsl(var(--foreground));
+        }
+
+        .tabs-trigger[data-state="active"] {
+            color: hsl(var(--foreground));
+            background-color: hsl(var(--muted));
+        }
+
+        .tabs-list {
+            display: flex;
+            align-items: center;
+            background: transparent;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-flex;
+            height: 1.5rem;
+            width: 2.75rem;
+            border-radius: 9999px;
+            border: 1px solid hsl(var(--border));
+            background-color: hsl(var(--muted));
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .switch[data-state="checked"] {
+            background-color: hsl(var(--primary));
+        }
+
+        .switch-thumb {
+            display: block;
+            height: 1.25rem;
+            width: 1.25rem;
+            border-radius: 9999px;
+            background-color: hsl(var(--background));
+            border: 1px solid hsl(var(--border));
+            transition: transform 0.2s;
+            transform: translateX(0.125rem);
+        }
+
+        .switch[data-state="checked"] .switch-thumb {
+            transform: translateX(1.375rem);
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: hsl(var(--muted-foreground));
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-item:hover {
+            color: hsl(var(--foreground));
+            background-color: hsl(var(--muted));
+        }
+
+        .sidebar-item.active {
+            color: hsl(var(--foreground));
+            background-color: hsl(var(--muted));
+            text-decoration: underline;
+            text-decoration-color: hsl(var(--foreground));
+            text-underline-offset: 4px;
+        }
+
+        .tabs-trigger[data-state="active"] {
+            color: hsl(var(--foreground));
+            background-color: transparent;
+            text-decoration: underline;
+            text-decoration-color: hsl(var(--foreground));
+            text-underline-offset: 4px;
+        }
+
+        .prompt-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid hsl(var(--border));
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .prompt-item:hover {
+            background-color: hsl(var(--muted));
+        }
+
+        .prompt-item.editing {
+            background-color: hsl(var(--accent));
+        }
+
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1rem;
+            height: 100%;
+        }
+
+        .separator {
+            width: 1px;
+            background-color: hsl(var(--border));
+            margin: 0 1rem;
+        }
+
+        .left-section {
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+
+        .right-section {
+            background-image: radial-gradient(circle, hsl(var(--muted)) 1px, transparent 1px);
+            background-size: 20px 20px;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            border: 1px solid hsl(var(--border));
+        }
+
+        .prompt-chain {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+
+        .base-prompt {
+            background-color: hsl(var(--card));
+            border: 2px solid hsl(var(--border));
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chained-prompts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .chained-prompt {
+            background-color: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            position: relative;
+        }
+
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background-color: hsl(var(--border));
+            z-index: 1;
+        }
+
+        .connection-line-1 {
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            transform: translate(-50%, -50%) rotate(-20deg);
+        }
+
+        .connection-line-2 {
+            top: 50%;
+            right: 50%;
+            width: 100px;
+            transform: translate(50%, -50%) rotate(20deg);
+        }
+
+        .connection-line-3 {
+            top: 70%;
+            left: 25%;
+            width: 80px;
+            transform: translate(-50%, -50%) rotate(-10deg);
+        }
+
+        .topic-row {
+            border: 1px solid hsl(var(--border));
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            background-color: hsl(var(--card));
+        }
+
+        .topic-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid hsl(var(--border));
+            background-color: hsl(var(--muted));
+        }
+
+        .topic-content {
+            padding: 1rem 1.5rem;
+        }
+
+        .prompts-list {
+            margin-bottom: 1rem;
+        }
+
+        .add-prompt-section {
+            border-top: 1px solid hsl(var(--border));
+            padding-top: 1rem;
+        }
+
+        /* Data Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid hsl(var(--border));
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .table-header {
+            background-color: hsl(var(--muted));
+            border-bottom: 1px solid hsl(var(--border));
+        }
+
+        .table-header th {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: hsl(var(--foreground));
+        }
+
+        .table-body td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid hsl(var(--border));
+            font-size: 0.875rem;
+            color: hsl(var(--foreground));
+        }
+
+        .table-body tr:hover {
+            background-color: hsl(var(--muted));
+        }
+
+        .table-body tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Collapsible Styles */
+        .collapsible {
+            border: 1px solid hsl(var(--border));
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            background-color: hsl(var(--card));
+        }
+
+        .collapsible-trigger {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            color: hsl(var(--foreground));
+            border-bottom: 1px solid hsl(var(--border));
+        }
+
+        .collapsible-trigger:hover {
+            background-color: hsl(var(--muted));
+        }
+
+        .collapsible-content {
+            padding: 1rem;
+            border-top: 1px solid hsl(var(--border));
+        }
+
+        .chevron {
+            transition: transform 0.2s;
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .chevron.open {
+            transform: rotate(180deg);
+        }
+
+        /* Actions */
+        .action-btn {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid hsl(var(--border));
+            border-radius: 0.25rem;
+            background: none;
+            color: hsl(var(--foreground));
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .action-btn:hover {
+            background-color: hsl(var(--muted));
+        }
+
+        .truncate {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="h-full bg-background text-foreground">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Theme Toggle Component
+        const ThemeToggle = () => {
+            const [isDark, setIsDark] = useState(() => {
+                return localStorage.getItem('theme') === 'dark' || 
+                       (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            });
+
+            useEffect(() => {
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            }, [isDark]);
+
+            return (
+                <div className="flex items-center gap-2 py-4">
+                    <span className="text-sm text-muted-foreground">Light</span>
+                    <button 
+                        className="switch" 
+                        data-state={isDark ? "checked" : "unchecked"}
+                        onClick={() => setIsDark(!isDark)}
+                    >
+                        <span className="switch-thumb"></span>
+                    </button>
+                    <span className="text-sm text-muted-foreground">Dark</span>
+                </div>
+            );
+        };
+
+        // Sidebar Item Component
+        const SidebarItem = ({ icon, label, isActive, onClick }) => (
+            <div 
+                className={`sidebar-item ${isActive ? 'active' : ''}`}
+                onClick={onClick}
+            >
+                <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {icon}
+                </svg>
+                {label}
+            </div>
+        );
+
+        // Editable Prompt Component
+        const EditablePrompt = ({ prompt, onUpdate, onDelete }) => {
+            const [isEditing, setIsEditing] = useState(false);
+            const [editValue, setEditValue] = useState(prompt.text);
+
+            const handleSave = () => {
+                onUpdate(prompt.id, editValue);
+                setIsEditing(false);
+            };
+
+            const handleCancel = () => {
+                setEditValue(prompt.text);
+                setIsEditing(false);
+            };
+
+            const handleKeyDown = (e) => {
+                if (e.key === 'Enter') {
+                    handleSave();
+                } else if (e.key === 'Escape') {
+                    handleCancel();
+                }
+            };
+
+            if (isEditing) {
+                return (
+                    <div className="prompt-item editing">
+                        <input
+                            type="text"
+                            className="input flex-1 mr-2"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            onBlur={handleSave}
+                            autoFocus
+                        />
+                    </div>
+                );
+            }
+
+            return (
+                <div 
+                    className="prompt-item"
+                    onClick={() => setIsEditing(true)}
+                >
+                    <span className="flex-1">{prompt.text}</span>
+                    <button 
+                        className="btn text-xs px-2 py-1"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(prompt.id);
+                        }}
+                    >
+                        Delete
+                    </button>
+                </div>
+            );
+        };
+
+        // Collapsible Topic Component
+        const CollapsibleTopic = ({ topic, prompts, onAddPrompt, onUpdatePrompt, onDeletePrompt }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            const [newPrompt, setNewPrompt] = useState('');
+
+            const handleAddPrompt = () => {
+                if (newPrompt.trim()) {
+                    onAddPrompt(topic.id, newPrompt.trim());
+                    setNewPrompt('');
+                }
+            };
+
+            const handleKeyDown = (e) => {
+                if (e.key === 'Enter') {
+                    handleAddPrompt();
+                }
+            };
+
+            const formatDate = (date) => {
+                return new Date(date).toLocaleDateString();
+            };
+
+            return (
+                <div className="collapsible">
+                    <button 
+                        className="collapsible-trigger"
+                        onClick={() => setIsOpen(!isOpen)}
+                    >
+                        <div className="flex items-center gap-4">
+                            <span>{topic.name}</span>
+                            <span className="text-sm text-muted-foreground">
+                                {prompts.length} prompts
+                            </span>
+                        </div>
+                        <svg 
+                            className={`chevron ${isOpen ? 'open' : ''}`}
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    
+                    {isOpen && (
+                        <div className="collapsible-content">
+                            {/* Prompts Data Table */}
+                            <table className="data-table mb-4">
+                                <thead className="table-header">
+                                    <tr>
+                                        <th>Prompt Title</th>
+                                        <th>Prompt Text</th>
+                                        <th>Created At</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="table-body">
+                                    {prompts.map(prompt => (
+                                        <tr key={prompt.id}>
+                                            <td className="font-medium">
+                                                {prompt.title || `Prompt ${prompt.id}`}
+                                            </td>
+                                            <td className="truncate">
+                                                {prompt.text}
+                                            </td>
+                                            <td className="text-muted-foreground">
+                                                {formatDate(prompt.createdAt || Date.now())}
+                                            </td>
+                                            <td>
+                                                <div className="flex gap-2">
+                                                    <button 
+                                                        className="action-btn"
+                                                        onClick={() => onUpdatePrompt(prompt.id, prompt.text)}
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button 
+                                                        className="action-btn"
+                                                        onClick={() => onDeletePrompt(prompt.id)}
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+
+                            {/* Add New Prompt */}
+                            <div className="add-prompt-section">
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        className="input flex-1"
+                                        placeholder="Add new prompt..."
+                                        value={newPrompt}
+                                        onChange={(e) => setNewPrompt(e.target.value)}
+                                        onKeyDown={handleKeyDown}
+                                    />
+                                    <button 
+                                        className="btn btn-primary"
+                                        onClick={handleAddPrompt}
+                                    >
+                                        Add Prompt
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Topics Overview Table Component
+        const TopicsOverviewTable = ({ topics, onToggleTopic }) => {
+            const formatDate = (date) => {
+                return new Date(date).toLocaleDateString();
+            };
+
+            return (
+                <table className="data-table mb-6">
+                    <thead className="table-header">
+                        <tr>
+                            <th>Topic Name</th>
+                            <th># of Prompts</th>
+                            <th>Last Updated</th>
+                            <th>Expand/Collapse</th>
+                        </tr>
+                    </thead>
+                    <tbody className="table-body">
+                        {topics.map(topic => (
+                            <tr key={topic.id}>
+                                <td className="font-medium">{topic.name}</td>
+                                <td>{topic.prompts.length}</td>
+                                <td className="text-muted-foreground">
+                                    {formatDate(topic.lastUpdated || Date.now())}
+                                </td>
+                                <td>
+                                    <button 
+                                        className="action-btn"
+                                        onClick={() => onToggleTopic(topic.id)}
+                                    >
+                                        Toggle
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            );
+        };
+
+        // Prompt Chaining Visualization Component
+        const PromptChaining = () => {
+            return (
+                <div className="prompt-chain">
+                    <h2 className="typography-h2 text-center mb-4">Prompt Chaining</h2>
+                    
+                    {/* Base Prompt */}
+                    <div className="base-prompt">
+                        Analyze brand visibility across AI platforms
+                    </div>
+
+                    {/* Connection Lines */}
+                    <div className="connection-line connection-line-1"></div>
+                    <div className="connection-line connection-line-2"></div>
+                    <div className="connection-line connection-line-3"></div>
+
+                    {/* Chained Prompts */}
+                    <div className="chained-prompts">
+                        <div className="chained-prompt">
+                            Compare brand mentions with competitors
+                        </div>
+                        <div className="chained-prompt">
+                            Track brand sentiment in AI responses
+                        </div>
+                        <div className="chained-prompt">
+                            Identify trending topics in our industry
+                        </div>
+                        <div className="chained-prompt">
+                            Analyze competitor positioning strategies
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Main Dashboard Component
+        const Dashboard = () => {
+            const [activeTab, setActiveTab] = useState('prompts');
+            const [activeSidebar, setActiveSidebar] = useState('visibility');
+            const [topics, setTopics] = useState([
+                {
+                    id: 1,
+                    name: 'Brand Visibility',
+                    lastUpdated: Date.now() - 86400000,
+                    prompts: [
+                        { id: 1, text: 'Analyze brand visibility across AI platforms', title: 'Brand Visibility Analysis', createdAt: Date.now() - 86400000 },
+                        { id: 2, text: 'Compare brand mentions with competitors', title: 'Competitor Comparison', createdAt: Date.now() - 172800000 },
+                        { id: 3, text: 'Track brand sentiment in AI responses', title: 'Sentiment Tracking', createdAt: Date.now() - 259200000 }
+                    ]
+                },
+                {
+                    id: 2,
+                    name: 'Market Analysis',
+                    lastUpdated: Date.now() - 43200000,
+                    prompts: [
+                        { id: 4, text: 'Identify trending topics in our industry', title: 'Trend Identification', createdAt: Date.now() - 43200000 },
+                        { id: 5, text: 'Analyze competitor positioning strategies', title: 'Positioning Analysis', createdAt: Date.now() - 129600000 },
+                        { id: 6, text: 'Track market sentiment changes', title: 'Market Sentiment', createdAt: Date.now() - 216000000 }
+                    ]
+                },
+                {
+                    id: 3,
+                    name: 'Content Optimization',
+                    lastUpdated: Date.now() - 21600000,
+                    prompts: [
+                        { id: 7, text: 'Optimize content for AI search visibility', title: 'SEO Optimization', createdAt: Date.now() - 21600000 },
+                        { id: 8, text: 'Improve brand mention accuracy', title: 'Brand Accuracy', createdAt: Date.now() - 86400000 },
+                        { id: 9, text: 'Enhance content for better AI responses', title: 'Content Enhancement', createdAt: Date.now() - 151200000 }
+                    ]
+                }
+            ]);
+
+            const tabs = [
+                { id: 'prompts', label: 'Prompts' },
+                { id: 'visibility', label: 'Visibility' },
+                { id: 'sentiment', label: 'Sentiment' },
+                { id: 'topics', label: 'Topics' },
+                { id: 'citations', label: 'Citations' }
+            ];
+
+            const sidebarItems = [
+                { 
+                    id: 'visibility', 
+                    label: 'Visibility', 
+                    icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                },
+                { 
+                    id: 'agent-analytics', 
+                    label: 'Agent Analytics', 
+                    icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                },
+                { 
+                    id: 'content-regeneration', 
+                    label: 'Content Regeneration', 
+                    icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                }
+            ];
+
+            const handleAddPrompt = (topicId, promptText) => {
+                setTopics(prev => prev.map(topic => {
+                    if (topic.id === topicId) {
+                        const newPrompt = {
+                            id: Date.now(),
+                            text: promptText,
+                            title: `New Prompt ${Date.now()}`,
+                            createdAt: Date.now()
+                        };
+                        return {
+                            ...topic,
+                            prompts: [...topic.prompts, newPrompt],
+                            lastUpdated: Date.now()
+                        };
+                    }
+                    return topic;
+                }));
+            };
+
+            const handleUpdatePrompt = (promptId, newText) => {
+                setTopics(prev => prev.map(topic => ({
+                    ...topic,
+                    prompts: topic.prompts.map(prompt => 
+                        prompt.id === promptId ? { ...prompt, text: newText } : prompt
+                    ),
+                    lastUpdated: Date.now()
+                })));
+            };
+
+            const handleDeletePrompt = (promptId) => {
+                setTopics(prev => prev.map(topic => ({
+                    ...topic,
+                    prompts: topic.prompts.filter(prompt => prompt.id !== promptId),
+                    lastUpdated: Date.now()
+                })));
+            };
+
+            const handleToggleTopic = (topicId) => {
+                // This could be used to programmatically toggle topic visibility
+                console.log('Toggle topic:', topicId);
+            };
+
+            const renderTabContent = () => {
+                switch (activeTab) {
+                    case 'prompts':
+                        return (
+                            <div className="split-layout">
+                                {/* Left Section - Prompts List */}
+                                <div className="left-section">
+                                    <div className="mb-6">
+                                        <h2 className="typography-h2">Prompts</h2>
+                                        <p className="typography-muted mt-2">
+                                            Manage and organize your AI prompts by topic.
+                                        </p>
+                                    </div>
+                                    
+                                    {/* Topics Overview Table */}
+                                    <TopicsOverviewTable 
+                                        topics={topics}
+                                        onToggleTopic={handleToggleTopic}
+                                    />
+                                    
+                                    {/* Collapsible Topics */}
+                                    <div className="space-y-4">
+                                        {topics.map(topic => (
+                                            <CollapsibleTopic
+                                                key={topic.id}
+                                                topic={topic}
+                                                prompts={topic.prompts}
+                                                onAddPrompt={handleAddPrompt}
+                                                onUpdatePrompt={handleUpdatePrompt}
+                                                onDeletePrompt={handleDeletePrompt}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Vertical Separator */}
+                                <div className="separator"></div>
+
+                                {/* Right Section - Workflow Builder */}
+                                <div className="right-section">
+                                    <PromptChaining />
+                                </div>
+                            </div>
+                        );
+                    default:
+                        return (
+                            <div className="space-y-6">
+                                <div>
+                                    <h2 className="typography-h2">{tabs.find(t => t.id === activeTab)?.label}</h2>
+                                    <p className="typography-muted mt-2">
+                                        {activeTab} analytics content will be implemented here.
+                                    </p>
+                                </div>
+                                <div className="card">
+                                    <h3 className="typography-h3 text-lg mb-4">{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Metrics</h3>
+                                    <p className="typography-muted">Detailed {activeTab} analysis coming soon.</p>
+                                </div>
+                            </div>
+                        );
+                }
+            };
+
+            return (
+                <div className="min-h-screen flex">
+                    {/* Left Sidebar */}
+                    <div className="w-64 border-r border-border bg-background p-6">
+                        <div className="space-y-2">
+                            {sidebarItems.map(item => (
+                                <SidebarItem
+                                    key={item.id}
+                                    icon={item.icon}
+                                    label={item.label}
+                                    isActive={activeSidebar === item.id}
+                                    onClick={() => setActiveSidebar(item.id)}
+                                />
+                            ))}
+                        </div>
+                        
+                        <div className="absolute bottom-6 left-6 right-6">
+                            <ThemeToggle />
+                            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors block mt-2">
+                                Contact Us
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Main Content Area */}
+                    <div className="flex-1 flex flex-col">
+                        {/* Header */}
+                        <header className="border-b border-border bg-background px-6 py-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <h1 className="typography-h1 text-2xl font-black tracking-tight text-foreground">
+                                        Rankly
+                                    </h1>
+                                </div>
+                            </div>
+                        </header>
+
+                        {/* Main Content */}
+                        <main className="flex-1 p-6">
+                            {/* Tabs Navigation */}
+                            <div className="tabs-list">
+                                {tabs.map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        className="tabs-trigger"
+                                        data-state={activeTab === tab.id ? "active" : "inactive"}
+                                        onClick={() => setActiveTab(tab.id)}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Tab Content */}
+                            {renderTabContent()}
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(<Dashboard />, document.getElementById('root'));
+    </script>
+</body>
+</html>

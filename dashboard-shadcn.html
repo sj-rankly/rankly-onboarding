@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rankly - Product Dashboard</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'Helvetica Neue', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        background: 'hsl(var(--background))',
+                        foreground: 'hsl(var(--foreground))',
+                        card: 'hsl(var(--card))',
+                        'card-foreground': 'hsl(var(--card-foreground))',
+                        popover: 'hsl(var(--popover))',
+                        'popover-foreground': 'hsl(var(--popover-foreground))',
+                        primary: 'hsl(var(--primary))',
+                        'primary-foreground': 'hsl(var(--primary-foreground))',
+                        secondary: 'hsl(var(--secondary))',
+                        'secondary-foreground': 'hsl(var(--secondary-foreground))',
+                        muted: 'hsl(var(--muted))',
+                        'muted-foreground': 'hsl(var(--muted-foreground))',
+                        accent: 'hsl(var(--accent))',
+                        'accent-foreground': 'hsl(var(--accent-foreground))',
+                        destructive: 'hsl(var(--destructive))',
+                        'destructive-foreground': 'hsl(var(--destructive-foreground))',
+                        border: 'hsl(var(--border))',
+                        input: 'hsl(var(--input))',
+                        ring: 'hsl(var(--ring))',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --background: 0 0% 100%;
+            --foreground: 0 0% 0%;
+            --card: 0 0% 100%;
+            --card-foreground: 0 0% 0%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 0 0% 0%;
+            --primary: 0 0% 0%;
+            --primary-foreground: 0 0% 100%;
+            --secondary: 0 0% 96%;
+            --secondary-foreground: 0 0% 0%;
+            --muted: 0 0% 96%;
+            --muted-foreground: 0 0% 45%;
+            --accent: 0 0% 96%;
+            --accent-foreground: 0 0% 0%;
+            --destructive: 0 0% 0%;
+            --destructive-foreground: 0 0% 100%;
+            --border: 0 0% 90%;
+            --input: 0 0% 90%;
+            --ring: 0 0% 0%;
+        }
+
+        .dark {
+            --background: 0 0% 0%;
+            --foreground: 0 0% 100%;
+            --card: 0 0% 0%;
+            --card-foreground: 0 0% 100%;
+            --popover: 0 0% 0%;
+            --popover-foreground: 0 0% 100%;
+            --primary: 0 0% 100%;
+            --primary-foreground: 0 0% 0%;
+            --secondary: 0 0% 15%;
+            --secondary-foreground: 0 0% 100%;
+            --muted: 0 0% 15%;
+            --muted-foreground: 0 0% 65%;
+            --accent: 0 0% 15%;
+            --accent-foreground: 0 0% 100%;
+            --destructive: 0 0% 100%;
+            --destructive-foreground: 0 0% 0%;
+            --border: 0 0% 20%;
+            --input: 0 0% 20%;
+            --ring: 0 0% 100%;
+        }
+
+        * {
+            border-color: hsl(var(--border));
+        }
+
+        body {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ShadCN Button Component */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1px solid hsl(var(--border));
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+        }
+
+        .btn-primary {
+            background-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+        }
+
+        .btn-primary:hover {
+            background-color: hsl(var(--primary) / 0.9);
+        }
+
+        .btn-ghost {
+            background-color: transparent;
+            color: hsl(var(--foreground));
+        }
+
+        .btn-ghost:hover {
+            background-color: hsl(var(--accent));
+        }
+
+        /* ShadCN Card Component */
+        .card {
+            background-color: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 hsl(var(--foreground) / 0.1);
+        }
+
+        .card-header {
+            padding: 1.5rem 1.5rem 0 1.5rem;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        /* ShadCN Input Component */
+        .input {
+            display: flex;
+            height: 2.5rem;
+            width: 100%;
+            border-radius: 0.5rem;
+            border: 1px solid hsl(var(--border));
+            background-color: hsl(var(--background));
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: hsl(var(--ring));
+            box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+        }
+
+        /* ShadCN Switch Component */
+        .switch {
+            display: inline-flex;
+            height: 24px;
+            width: 44px;
+            padding: 0;
+            border-radius: 9999px;
+            cursor: pointer;
+            background-color: hsl(var(--input));
+            position: relative;
+            transition: background-color 0.2s;
+            border: none;
+        }
+
+        .switch[data-state="checked"] {
+            background-color: hsl(var(--primary));
+        }
+
+        .switch-thumb {
+            display: block;
+            height: 16px;
+            width: 16px;
+            border-radius: 9999px;
+            background-color: hsl(var(--primary-foreground));
+            transform: translateX(4px);
+            transition: transform 0.2s;
+            position: absolute;
+            top: 4px;
+            left: 0;
+        }
+
+        .switch[data-state="checked"] .switch-thumb {
+            transform: translateX(24px);
+        }
+
+        /* ShadCN Separator Component */
+        .separator {
+            height: 1px;
+            width: 100%;
+            background-color: hsl(var(--border));
+        }
+
+        .separator-vertical {
+            width: 1px;
+            height: 100%;
+            background-color: hsl(var(--border));
+        }
+
+        /* ShadCN Collapsible Component */
+        .collapsible {
+            border: 1px solid hsl(var(--border));
+            border-radius: 0.5rem;
+            background-color: hsl(var(--card));
+            margin-bottom: 0.5rem;
+        }
+
+        .collapsible-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: hsl(var(--foreground));
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .collapsible-content {
+            padding: 0 1rem 1rem 1rem;
+        }
+
+        /* ShadCN Table Component */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid hsl(var(--border));
+        }
+
+        .table th {
+            font-weight: 600;
+            color: hsl(var(--foreground));
+        }
+
+        .table td {
+            color: hsl(var(--foreground));
+        }
+
+        /* Custom Styles */
+        .sidebar {
+            width: 250px;
+            background-color: hsl(var(--card));
+            border-right: 1px solid hsl(var(--border));
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: hsl(var(--muted-foreground));
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .sidebar-item:hover {
+            background-color: hsl(var(--accent));
+            color: hsl(var(--accent-foreground));
+        }
+
+        .sidebar-item.active {
+            background-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: hsl(var(--background));
+        }
+
+        .header {
+            border-bottom: 1px solid hsl(var(--border));
+            padding: 1rem 2rem;
+            background-color: hsl(var(--background));
+        }
+
+        .tabs {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .tab {
+            padding: 0.5rem 0;
+            color: hsl(var(--muted-foreground));
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .tab.active {
+            color: hsl(var(--foreground));
+            font-weight: 600;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: hsl(var(--foreground));
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 2rem;
+            background-color: hsl(var(--background));
+        }
+
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1px 1fr;
+            gap: 2rem;
+            height: 100%;
+        }
+
+        .prompt-chain {
+            background-image: radial-gradient(circle, hsl(var(--muted)) 1px, transparent 1px);
+            background-size: 20px 20px;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            position: relative;
+            min-height: 400px;
+        }
+
+        .central-node {
+            position: absolute;
+            left: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .branching-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .branch-line {
+            stroke: hsl(var(--border));
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .chained-nodes {
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chained-node {
+            background-color: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: hsl(var(--card-foreground));
+            font-size: 0.875rem;
+            min-width: 150px;
+        }
+
+        /* ShadCN Typography Components */
+        .typography-h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.025em;
+            color: hsl(var(--foreground));
+            margin: 0;
+        }
+
+        .typography-h2 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -0.025em;
+            color: hsl(var(--foreground));
+            margin: 0;
+        }
+
+        .typography-h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: hsl(var(--foreground));
+            margin: 0;
+        }
+
+        .typography-h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: hsl(var(--foreground));
+            margin: 0;
+        }
+
+        .typography-p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: hsl(var(--foreground));
+            margin: 0;
+        }
+
+        .typography-lead {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            color: hsl(var(--muted-foreground));
+            margin: 0;
+        }
+
+        .typography-large {
+            font-size: 1.125rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: hsl(var(--foreground));
+            margin: 0;
+        }
+
+        .typography-small {
+            font-size: 0.875rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: hsl(var(--muted-foreground));
+            margin: 0;
+        }
+
+        .typography-muted {
+            font-size: 0.875rem;
+            color: hsl(var(--muted-foreground));
+            margin: 0;
+        }
+
+        .typography-blockquote {
+            border-left: 4px solid hsl(var(--border));
+            padding-left: 1rem;
+            font-style: italic;
+            color: hsl(var(--muted-foreground));
+            margin: 0;
+        }
+
+        .typography-inline-code {
+            background-color: hsl(var(--muted));
+            color: hsl(var(--muted-foreground));
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Typography Components
+        const TypographyH1 = ({ children, className = "" }) => (
+            <h1 className={`typography-h1 ${className}`}>{children}</h1>
+        );
+
+        const TypographyH2 = ({ children, className = "" }) => (
+            <h2 className={`typography-h2 ${className}`}>{children}</h2>
+        );
+
+        const TypographyH3 = ({ children, className = "" }) => (
+            <h3 className={`typography-h3 ${className}`}>{children}</h3>
+        );
+
+        const TypographyH4 = ({ children, className = "" }) => (
+            <h4 className={`typography-h4 ${className}`}>{children}</h4>
+        );
+
+        const TypographyP = ({ children, className = "" }) => (
+            <p className={`typography-p ${className}`}>{children}</p>
+        );
+
+        const TypographyLead = ({ children, className = "" }) => (
+            <p className={`typography-lead ${className}`}>{children}</p>
+        );
+
+        const TypographyLarge = ({ children, className = "" }) => (
+            <div className={`typography-large ${className}`}>{children}</div>
+        );
+
+        const TypographySmall = ({ children, className = "" }) => (
+            <small className={`typography-small ${className}`}>{children}</small>
+        );
+
+        const TypographyMuted = ({ children, className = "" }) => (
+            <p className={`typography-muted ${className}`}>{children}</p>
+        );
+
+        const TypographyBlockquote = ({ children, className = "" }) => (
+            <blockquote className={`typography-blockquote ${className}`}>{children}</blockquote>
+        );
+
+        const TypographyInlineCode = ({ children, className = "" }) => (
+            <code className={`typography-inline-code ${className}`}>{children}</code>
+        );
+
+        // Theme Toggle Component
+        const ThemeToggle = () => {
+            const [isDark, setIsDark] = useState(() => {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme) {
+                    return savedTheme === 'dark';
+                }
+                return window.matchMedia('(prefers-color-scheme: dark)').matches;
+            });
+
+            useEffect(() => {
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            }, [isDark]);
+
+            return (
+                <div className="flex items-center gap-2">
+                    <TypographySmall>Light</TypographySmall>
+                    <button 
+                        className="switch" 
+                        data-state={isDark ? "checked" : "unchecked"}
+                        onClick={() => setIsDark(!isDark)}
+                    >
+                        <span className="switch-thumb"></span>
+                    </button>
+                    <TypographySmall>Dark</TypographySmall>
+                </div>
+            );
+        };
+
+        // Sidebar Item Component
+        const SidebarItem = ({ icon, label, active, onClick }) => {
+            return (
+                <button 
+                    className={`sidebar-item ${active ? 'active' : ''}`}
+                    onClick={onClick}
+                >
+                    {icon}
+                    <span>{label}</span>
+                </button>
+            );
+        };
+
+        // Editable Prompt Component
+        const EditablePrompt = ({ prompt, onUpdate, onDelete }) => {
+            const [isEditing, setIsEditing] = useState(false);
+            const [text, setText] = useState(prompt.text);
+
+            const handleSave = () => {
+                onUpdate(prompt.id, text);
+                setIsEditing(false);
+            };
+
+            const handleCancel = () => {
+                setText(prompt.text);
+                setIsEditing(false);
+            };
+
+            return (
+                <div className="card" style={{marginBottom: '0.5rem'}}>
+                    <div className="card-content">
+                        <div className="flex items-center justify-between">
+                            {isEditing ? (
+                                <div className="flex-1 mr-2">
+                                    <input
+                                        className="input"
+                                        value={text}
+                                        onChange={(e) => setText(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') handleSave();
+                                            if (e.key === 'Escape') handleCancel();
+                                        }}
+                                        autoFocus
+                                    />
+                                </div>
+                            ) : (
+                                <div className="flex-1 mr-2">
+                                    <TypographyP>{prompt.text}</TypographyP>
+                                </div>
+                            )}
+                            <div className="flex gap-2">
+                                {isEditing ? (
+                                    <>
+                                        <button className="btn btn-primary" onClick={handleSave}>Save</button>
+                                        <button className="btn btn-ghost" onClick={handleCancel}>Cancel</button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button className="btn btn-ghost" onClick={() => setIsEditing(true)}>Edit</button>
+                                        <button className="btn btn-ghost" onClick={() => onDelete(prompt.id)}>×</button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Collapsible Topic Component
+        const CollapsibleTopic = ({ topic, onAddPrompt, onUpdatePrompt, onDeletePrompt }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            const [newPromptText, setNewPromptText] = useState('');
+
+            const handleAddPrompt = () => {
+                if (newPromptText.trim()) {
+                    onAddPrompt(topic.id, newPromptText.trim());
+                    setNewPromptText('');
+                }
+            };
+
+            return (
+                <div className="collapsible">
+                    <button 
+                        className="collapsible-trigger"
+                        onClick={() => setIsOpen(!isOpen)}
+                    >
+                        <span>{topic.name}</span>
+                        <svg 
+                            width="16" 
+                            height="16" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="2"
+                            style={{
+                                transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                                transition: 'transform 0.2s'
+                            }}
+                        >
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </button>
+                    {isOpen && (
+                        <div className="collapsible-content">
+                            {topic.prompts.map(prompt => (
+                                <EditablePrompt
+                                    key={prompt.id}
+                                    prompt={prompt}
+                                    onUpdate={onUpdatePrompt}
+                                    onDelete={onDeletePrompt}
+                                />
+                            ))}
+                            <div className="flex gap-2 mt-4">
+                                <input
+                                    className="input flex-1"
+                                    placeholder="Add new prompt..."
+                                    value={newPromptText}
+                                    onChange={(e) => setNewPromptText(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleAddPrompt();
+                                    }}
+                                />
+                                <button className="btn btn-primary" onClick={handleAddPrompt}>Add</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Prompt Chaining Component
+        const PromptChaining = () => {
+            return (
+                <div className="prompt-chain">
+                    <div className="branching-lines">
+                        <svg width="100%" height="100%" style={{position: 'absolute', top: 0, left: 0}}>
+                            <path
+                                className="branch-line"
+                                d="M 200 200 Q 300 150 400 150"
+                                markerEnd="url(#arrowhead)"
+                            />
+                            <path
+                                className="branch-line"
+                                d="M 200 200 Q 300 200 400 200"
+                                markerEnd="url(#arrowhead)"
+                            />
+                            <path
+                                className="branch-line"
+                                d="M 200 200 Q 300 250 400 250"
+                                markerEnd="url(#arrowhead)"
+                            />
+                            <defs>
+                                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                    <polygon points="0 0, 10 3.5, 0 7" fill="hsl(var(--border))" />
+                                </marker>
+                            </defs>
+                        </svg>
+                    </div>
+                    
+                    <div className="central-node">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                        Root Prompt
+                    </div>
+                    
+                    <div className="chained-nodes">
+                        <div className="chained-node">Project management tools like</div>
+                        <div className="chained-node">Project management tools include</div>
+                        <div className="chained-node">Using project management tool</div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Main Dashboard Component
+        const Dashboard = () => {
+            const [activeTab, setActiveTab] = useState('Prompt Analytics');
+            const [activeSidebar, setActiveSidebar] = useState('Visibility');
+            const [topics, setTopics] = useState([
+                {
+                    id: '1',
+                    name: 'Brand Visibility',
+                    lastUpdated: '2024-01-15',
+                    prompts: [
+                        { id: '1', text: 'Generate content about our brand visibility in the market', title: 'Brand Awareness', createdAt: '2024-01-15' },
+                        { id: '2', text: 'Create posts highlighting our brand achievements', title: 'Brand Success', createdAt: '2024-01-14' }
+                    ]
+                },
+                {
+                    id: '2',
+                    name: 'Market Analysis',
+                    lastUpdated: '2024-01-14',
+                    prompts: [
+                        { id: '3', text: 'Analyze market trends in our industry', title: 'Market Trends', createdAt: '2024-01-14' },
+                        { id: '4', text: 'Compare our performance with competitors', title: 'Competitive Analysis', createdAt: '2024-01-13' }
+                    ]
+                },
+                {
+                    id: '3',
+                    name: 'Content Optimization',
+                    lastUpdated: '2024-01-13',
+                    prompts: [
+                        { id: '5', text: 'Optimize content for better engagement', title: 'Engagement Optimization', createdAt: '2024-01-13' },
+                        { id: '6', text: 'Improve SEO performance of our content', title: 'SEO Enhancement', createdAt: '2024-01-12' }
+                    ]
+                }
+            ]);
+
+            const handleAddPrompt = (topicId, text) => {
+                setTopics(prev => prev.map(topic => 
+                    topic.id === topicId 
+                        ? {
+                            ...topic,
+                            prompts: [...topic.prompts, {
+                                id: Date.now().toString(),
+                                text,
+                                title: 'New Prompt',
+                                createdAt: new Date().toISOString().split('T')[0]
+                            }],
+                            lastUpdated: new Date().toISOString().split('T')[0]
+                        }
+                        : topic
+                ));
+            };
+
+            const handleUpdatePrompt = (topicId, promptId, newText) => {
+                setTopics(prev => prev.map(topic => 
+                    topic.id === topicId 
+                        ? {
+                            ...topic,
+                            prompts: topic.prompts.map(prompt => 
+                                prompt.id === promptId ? { ...prompt, text: newText } : prompt
+                            )
+                        }
+                        : topic
+                ));
+            };
+
+            const handleDeletePrompt = (topicId, promptId) => {
+                setTopics(prev => prev.map(topic => 
+                    topic.id === topicId 
+                        ? {
+                            ...topic,
+                            prompts: topic.prompts.filter(prompt => prompt.id !== promptId)
+                        }
+                        : topic
+                ));
+            };
+
+            const sidebarItems = [
+                { id: 'Visibility', icon: '👁️', label: 'Visibility' },
+                { id: 'Agent Analytics', icon: '📊', label: 'Agent Analytics' },
+                { id: 'Content Regeneration', icon: '🔄', label: 'Content Regeneration' }
+            ];
+
+            const tabs = ['Prompt Analytics', 'Visibility', 'Sentiment', 'Topics', 'Citations'];
+
+            return (
+                <div style={{display: 'flex', height: '100vh', backgroundColor: 'hsl(var(--background))', color: 'hsl(var(--foreground))'}}>
+                    {/* Sidebar */}
+                    <div className="sidebar">
+                        <div style={{padding: '1.5rem 1rem', borderBottom: '1px solid hsl(var(--border))'}}>
+                            <TypographyH3>Rankly</TypographyH3>
+                        </div>
+                        
+                        <div style={{flex: 1, padding: '1rem 0'}}>
+                            {sidebarItems.map(item => (
+                                <SidebarItem
+                                    key={item.id}
+                                    icon={item.icon}
+                                    label={item.label}
+                                    active={activeSidebar === item.id}
+                                    onClick={() => setActiveSidebar(item.id)}
+                                />
+                            ))}
+                        </div>
+                        
+                        <div style={{padding: '1rem', borderTop: '1px solid hsl(var(--border))'}}>
+                            <ThemeToggle />
+                            <div style={{marginTop: '1rem'}}>
+                                <a href="#" style={{color: 'hsl(var(--muted-foreground))', textDecoration: 'none', fontSize: '0.875rem'}}>
+                                    Contact Us
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Main Content */}
+                    <div className="main-content">
+                        {/* Header */}
+                        <div className="header">
+                            <div>
+                                <TypographyH1>Product Dashboard</TypographyH1>
+                                <div className="tabs">
+                                    {tabs.map(tab => (
+                                        <button
+                                            key={tab}
+                                            className={`tab ${activeTab === tab ? 'active' : ''}`}
+                                            onClick={() => setActiveTab(tab)}
+                                        >
+                                            {tab}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Content Area */}
+                        <div className="content-area">
+                            {activeTab === 'Prompt Analytics' && (
+                                <div className="split-layout">
+                                    <div>
+                                        <TypographyH2 style={{marginBottom: '0.5rem'}}>Prompts</TypographyH2>
+                                        <TypographyLead style={{marginBottom: '2rem'}}>
+                                            Manage and organize your AI prompts by topic.
+                                        </TypographyLead>
+                                        {topics.map(topic => (
+                                            <CollapsibleTopic
+                                                key={topic.id}
+                                                topic={topic}
+                                                onAddPrompt={handleAddPrompt}
+                                                onUpdatePrompt={handleUpdatePrompt}
+                                                onDeletePrompt={handleDeletePrompt}
+                                            />
+                                        ))}
+                                    </div>
+                                    <div className="separator-vertical"></div>
+                                    <div>
+                                        <TypographyH2 style={{marginBottom: '2rem'}}>
+                                            Prompt Chaining
+                                        </TypographyH2>
+                                        <PromptChaining />
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {activeTab !== 'Prompt Analytics' && (
+                                <div>
+                                    <TypographyH2 style={{marginBottom: '1rem'}}>
+                                        {activeTab}
+                                    </TypographyH2>
+                                    <TypographyMuted>
+                                        Content for {activeTab} will be displayed here.
+                                    </TypographyMuted>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Render App
+        ReactDOM.render(<Dashboard />, document.getElementById('root'));
+    </script>
+</body>
+</html>
