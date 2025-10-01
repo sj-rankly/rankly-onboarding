@@ -82,8 +82,8 @@ function App() {
   const [newTopicName, setNewTopicName] = useState('')
 
   // Region & Language state
-  const [selectedRegion, setSelectedRegion] = useState('')
-  const [selectedLanguage, setSelectedLanguage] = useState('')
+  const [selectedRegion] = useState('global') // Fixed to global
+  const [selectedLanguage] = useState('english') // Fixed to english
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false)
   const [showMetrics, setShowMetrics] = useState(false)
 
@@ -382,8 +382,8 @@ function App() {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Competitors</h2>
-          <p className="text-muted-foreground">Manage your competitor list for analysis</p>
+          <h2 className="text-h3 font-heading">Competitors</h2>
+          <p className="text-body text-muted-foreground">Manage your competitor list for analysis</p>
         </div>
 
         <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
@@ -489,8 +489,8 @@ function App() {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Topics</h2>
-          <p className="text-muted-foreground">Select topics to generate prompts</p>
+          <h2 className="text-h3 font-heading">Topics</h2>
+          <p className="text-body text-muted-foreground">Select topics to generate prompts</p>
         </div>
 
         <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
@@ -576,16 +576,14 @@ function App() {
   // Region & Language Component
   const RegionLanguage = () => {
     const handleGeneratePrompts = () => {
-      if (selectedRegion && selectedLanguage) {
-        setIsGeneratingPrompts(true)
-        setShowMetrics(false)
-        
-        // Show metrics after 4 seconds
-        setTimeout(() => {
-          setIsGeneratingPrompts(false)
-          setShowMetrics(true)
-        }, 4000)
-      }
+      setIsGeneratingPrompts(true)
+      setShowMetrics(false)
+      
+      // Show metrics after 4 seconds
+      setTimeout(() => {
+        setIsGeneratingPrompts(false)
+        setShowMetrics(true)
+      }, 4000)
     }
 
     if (showMetrics) {
@@ -593,7 +591,7 @@ function App() {
       return (
         <div className="space-y-6">
           <div className="bg-card border border-border rounded-lg p-6 text-center">
-            <h2 className="text-2xl font-semibold tracking-tight mb-4">View Dashboard for more insights</h2>
+            <h2 className="text-h3 font-heading mb-4">View Dashboard for more insights</h2>
             <Button
               size="lg"
               className="w-full"
@@ -609,10 +607,6 @@ function App() {
           <Separator />
 
           <div className="flex items-center justify-between">
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
-              Contact us
-            </a>
-            <ThemeToggle />
           </div>
         </div>
       )
@@ -623,48 +617,53 @@ function App() {
       <div className="space-y-6">
         <div className="bg-card border border-border rounded-lg p-6 flex flex-col gap-4">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight mb-2">Region & Language</h2>
-            <p className="text-muted-foreground">Select your target region and language for prompt generation</p>
+            <h2 className="text-h3 font-heading mb-2">Region & Language</h2>
+            <p className="text-body text-muted-foreground">Select your target region and language for prompt generation</p>
           </div>
 
           <div className="space-y-4">
-            {/* Region Dropdown */}
+            {/* Region Display */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Region</label>
-              <select
-                value={selectedRegion}
-                onChange={(e) => setSelectedRegion(e.target.value)}
-                className="w-full p-3 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              >
-                <option value="">Select Region</option>
-                <option value="north-america">North America</option>
-                <option value="europe">Europe</option>
-                <option value="asia">Asia</option>
-                <option value="south-america">South America</option>
-                <option value="africa">Africa</option>
-                <option value="oceania">Oceania</option>
-              </select>
+              <label className="block text-caption text-foreground mb-2">Region</label>
+              <div className="flex items-center justify-between p-3 rounded-md border border-input bg-background text-foreground">
+                <span>Global</span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-muted-foreground"
+                >
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
             </div>
 
-            {/* Language Dropdown */}
+            {/* Language Display */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Language</label>
-              <select
-                value={selectedLanguage}
-                onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="w-full p-3 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              >
-                <option value="">Select Language</option>
-                <option value="english">English</option>
-                <option value="spanish">Spanish</option>
-                <option value="french">French</option>
-                <option value="german">German</option>
-                <option value="italian">Italian</option>
-                <option value="portuguese">Portuguese</option>
-                <option value="chinese">Chinese</option>
-                <option value="japanese">Japanese</option>
-                <option value="korean">Korean</option>
-              </select>
+              <label className="block text-caption text-foreground mb-2">Language</label>
+              <div className="flex items-center justify-between p-3 rounded-md border border-input bg-background text-foreground">
+                <span>English</span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-muted-foreground"
+                >
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
             </div>
           </div>
 
@@ -672,10 +671,14 @@ function App() {
             size="lg"
             className="w-full mt-4"
             onClick={handleGeneratePrompts}
-            disabled={!selectedRegion || !selectedLanguage || isGeneratingPrompts}
+            disabled={isGeneratingPrompts}
           >
             {isGeneratingPrompts ? 'Generating...' : 'Generate Prompts'}
           </Button>
+          
+          <p className="text-label text-muted-foreground text-center mt-3">
+            More languages and regions soon…
+          </p>
         </div>
 
       </div>
@@ -687,8 +690,8 @@ function App() {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">User Personas</h2>
-          <p className="text-muted-foreground">Select personas to generate prompts</p>
+          <h2 className="text-h3 font-heading">User Personas</h2>
+          <p className="text-body text-muted-foreground">Select personas to generate prompts</p>
         </div>
 
         <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
@@ -708,7 +711,7 @@ function App() {
               >
                 {/* Header Row */}
                 <div className="flex justify-between items-start">
-                  <h3 className="font-semibold text-foreground text-sm uppercase tracking-wide">
+                  <h3 className="text-caption text-foreground uppercase tracking-wide">
                     {persona.type}
                   </h3>
                   <Button
@@ -798,50 +801,65 @@ function App() {
       }
     }
 
+    const handleGoogleLogin = () => {
+      console.log('Google login clicked')
+      setCurrentStep(4) // Skip verification and personal details for Google login
+    }
+
     return (
-      <div className="space-y-8">
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted border border-border mb-4">
-            <svg className="w-8 h-8 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-            </svg>
-          </div>
-          <h2 className="text-3xl font-bold tracking-tight text-foreground">
-            Welcome to Rankly
+      <div className="space-y-6">
+        <div className="text-center space-y-2">
+          <h2 className="text-h2 font-heading text-foreground">
+            Create an account
           </h2>
-          <p className="text-muted-foreground text-lg">Let's start with your email address</p>
+          <p className="text-body text-muted-foreground">Enter your work email below to create your account</p>
         </div>
         
-        <div className="space-y-6">
+        <div className="space-y-4">
+          {/* Google Login Button */}
+          <Button 
+            variant="outline"
+            className="w-full h-12 border border-input bg-background hover:bg-muted text-foreground"
+            onClick={handleGoogleLogin}
+          >
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Google
+          </Button>
+
+          {/* Separator */}
           <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">OR CONTINUE WITH</span>
+            </div>
+          </div>
+
+          {/* Email Input */}
+          <div className="space-y-2">
+            <label className="text-caption text-foreground">Email</label>
             <Input 
               type="email" 
               placeholder="name@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
-              className="h-12 text-lg border-2 focus:border-foreground/50 transition-all duration-300"
+              className="h-12"
             />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-              {email.includes('@') && email.length > 5 ? (
-                <svg className="w-5 h-5 text-foreground" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                </svg>
-              )}
-            </div>
           </div>
           
           <Button 
-            className="w-full h-12 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90 transition-all duration-300 shadow-lg hover:shadow-xl" 
-            size="lg"
+            className="w-full h-12 bg-foreground text-background hover:bg-foreground/90" 
             onClick={handleContinue}
             disabled={!email.includes('@') || email.length < 5}
           >
-            Continue →
+            Continue
           </Button>
         </div>
         
@@ -888,12 +906,12 @@ function App() {
 
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Verify your email</h2>
-          <p className="text-muted-foreground">Enter the 6-digit code we sent you</p>
+        <div className="text-center">
+          <h2 className="text-h3 font-heading">Verify your email</h2>
+          <p className="text-body text-muted-foreground">Enter the 6-digit code we sent you</p>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex gap-2 justify-center">
           {codes.map((code, index) => (
             <Input
               key={index}
@@ -909,14 +927,16 @@ function App() {
           ))}
         </div>
         
-        <Button 
-          className="w-full" 
-          size="lg"
-          onClick={handleContinue}
-          disabled={codes.some(code => !code)}
-        >
-          Continue
-        </Button>
+        <div className="flex justify-center">
+          <Button 
+            className="w-fit px-8" 
+            size="lg"
+            onClick={handleContinue}
+            disabled={codes.some(code => !code)}
+          >
+            Continue
+          </Button>
+        </div>
 
       </div>
     )
@@ -937,8 +957,8 @@ function App() {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Tell us about yourself</h2>
-          <p className="text-muted-foreground">We'll personalize your experience</p>
+          <h2 className="text-h3 font-heading">Tell us about yourself</h2>
+          <p className="text-body text-muted-foreground">We'll personalize your experience</p>
         </div>
         
         <div className="space-y-4">
@@ -976,10 +996,9 @@ function App() {
   // Step 4: Campaign Setup
   const CampaignStep = () => {
     const [url, setUrl] = useState('')
-    const [name, setName] = useState('')
 
     const handleAnalyze = () => {
-      if (url && name) {
+      if (url) {
         console.log('CampaignStep: Starting analysis...')
         setIsAnalyzing(true)
       }
@@ -988,8 +1007,7 @@ function App() {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Enter your website URL and campaign name</h2>
-          <p className="text-muted-foreground">We'll scrape your site and prepare your campaign context.</p>
+          <h2 className="text-h3 font-heading">Enter your website URL</h2>
         </div>
         
         <div className="space-y-4">
@@ -999,16 +1017,11 @@ function App() {
             value={url}
             onChange={(e) => setUrl(e.target.value)}
           />
-          <Input 
-            placeholder="Summer Campaign 2025"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
           <Button 
             className="w-full" 
             size="lg"
             onClick={handleAnalyze}
-            disabled={!url || !name || isAnalyzing}
+            disabled={!url || isAnalyzing}
           >
             {isAnalyzing ? 'Analyzing...' : 'Analyze →'}
           </Button>
@@ -1147,18 +1160,26 @@ function App() {
           <div className="flex flex-col items-center justify-center h-full px-8">
             <div className="space-y-4 w-full max-w-sm">
               <div className="bg-card border border-border rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold text-foreground mb-2">78%</div>
-                <div className="text-sm font-medium text-foreground mb-1">Impression Share</div>
-                <div className="text-xs text-muted-foreground">
-                  Shows how much of the answer is about this brand.
+                <div className="text-3xl text-metric text-foreground mb-2">85%</div>
+                <div className="text-caption text-foreground mb-1">Visibility Score</div>
+                <div className="text-label text-muted-foreground">
+                  How often your brand appears in AI-generated answers across selected platforms, topics, and personas
                 </div>
               </div>
-              
+
               <div className="bg-card border border-border rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold text-foreground mb-2">67%</div>
-                <div className="text-sm font-medium text-foreground mb-1">Visibility Score</div>
-                <div className="text-xs text-muted-foreground">
-                  Shows how prominently the brand appears, giving more weight to earlier mentions.
+                <div className="text-3xl text-metric text-foreground mb-2">42%</div>
+                <div className="text-caption text-foreground mb-1">Citation Share</div>
+                <div className="text-label text-muted-foreground">
+                  Citation share over time and domain rankings for your brand
+                </div>
+              </div>
+
+              <div className="bg-card border border-border rounded-lg p-4 text-center">
+                <div className="text-3xl text-metric text-foreground mb-2">12</div>
+                <div className="text-caption text-foreground mb-1">Opportunities</div>
+                <div className="text-label text-muted-foreground">
+                  How can you improve your brand's visibility on LLMs
                 </div>
               </div>
             </div>
@@ -1215,12 +1236,12 @@ function App() {
     return (
       <div className="text-center space-y-6">
         <div className="relative">
-          <h2 className="text-5xl font-black tracking-tight text-foreground">
-            Get more traffic from LLMs
-          </h2>
+        <h2 className="text-h1 font-heading text-foreground">
+          Get more traffic from LLMs
+        </h2>
         </div>
         <p className="text-lg text-muted-foreground max-w-md mx-auto">
-          Transform your content strategy with AI-powered insights and competitor analysis
+          
         </p>
         <div className="flex justify-center space-x-2 mt-8">
           {[1, 2, 3].map((dot) => (
@@ -1241,14 +1262,7 @@ function App() {
       <div className="flex-1 relative bg-background">
         {/* Brand Logo - Top Left */}
         <div className="absolute top-6 left-6 z-10">
-          <h1 
-            className="text-3xl font-black tracking-tight text-foreground"
-            style={{
-              fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-              letterSpacing: '-0.02em',
-              fontWeight: '900'
-            }}
-          >
+          <h1 className="text-3xl font-logo text-foreground">
             Rankly
           </h1>
         </div>
