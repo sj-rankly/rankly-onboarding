@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import apiService from '../services/api'
 
 // Types
 export interface Competitor {
@@ -38,6 +39,10 @@ interface OnboardingContextType {
   data: OnboardingData
   updateData: (updates: Partial<OnboardingData>) => void
   resetData: () => void
+  saveToBackend: () => Promise<void>
+  loadFromBackend: () => Promise<void>
+  isLoading: boolean
+  error: string | null
 }
 
 const defaultData: OnboardingData = {
@@ -104,6 +109,9 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     return defaultData
   })
 
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
   const updateData = (updates: Partial<OnboardingData>) => {
     setData(prev => {
       const newData = { ...prev, ...updates }
@@ -124,8 +132,136 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('onboarding-data')
   }
 
+  const saveToBackend = async () => {
+    if (!apiService.token) {
+      setError('Not authenticated. Please login first.')
+      return
+    }
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      // Convert frontend data to backend format
+      const backendData = {
+        profile: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          company: data.companyName,
+          website: data.websiteUrl
+        },
+        websiteUrl: data.websiteUrl,
+        competitors: Array.from(data.selectedCompetitors).map(id => 
+          data.competitors.find(c => c.id === id)?.url
+        ).filter(Boolean),
+        topics: Array.from(data.selectedTopics).map(id => 
+          data.topics.find(t => t.id === id)?.name
+        ).filter(Boolean),
+        personas: Array.from(data.selectedPersonas).map(id => 
+          data.personas.find(p => p.id === id)?.description
+        ).filter(Boolean),
+        regions: [data.region],
+        languages: [data.language],
+        preferences: {
+          industry: data.companyName,
+          targetAudience: Array.from(data.selectedPersonas).map(id => 
+            data.personas.find(p => p.id === id)?.type
+          ).filter(Boolean).join(', '),
+          goals: ['Improve SEO', 'Increase visibility', 'Content optimization']
+        },
+        currentStep: 8,
+        isCompleted: true
+      }
+
+      await apiService.updateOnboardingBulk(backendData)
+      console.log('✅ Onboarding data saved to backend')
+    } catch (err) {
+      console.error('❌ Failed to save onboarding data:', err)
+      setError(err instanceof Error ? err.message : 'Failed to save data')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const loadFromBackend = async () => {
+    if (!apiService.token) {
+      setError('Not authenticated. Please login first.')
+      return
+    }
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const response = await apiService.getOnboardingData()
+      const backendData = response.data.onboarding
+
+      // Convert backend data to frontend format
+      const frontendData: Partial<OnboardingData> = {
+        firstName: backendData.profile?.firstName || '',
+        lastName: backendData.profile?.lastName || '',
+        companyName: backendData.profile?.company || '',
+        websiteUrl: backendData.websiteUrl || '',
+        region: backendData.regions?.[0] || 'Global',
+        language: backendData.languages?.[0] || 'English'
+      }
+
+      // Update competitors selection
+      if (backendData.competitors) {
+        const selectedCompetitors = new Set<string>()
+        backendData.competitors.forEach((url: string) => {
+          const competitor = data.competitors.find(c => c.url === url)
+          if (competitor) {
+            selectedCompetitors.add(competitor.id)
+          }
+        })
+        frontendData.selectedCompetitors = selectedCompetitors
+      }
+
+      // Update topics selection
+      if (backendData.topics) {
+        const selectedTopics = new Set<string>()
+        backendData.topics.forEach((topicName: string) => {
+          const topic = data.topics.find(t => t.name === topicName)
+          if (topic) {
+            selectedTopics.add(topic.id)
+          }
+        })
+        frontendData.selectedTopics = selectedTopics
+      }
+
+      // Update personas selection
+      if (backendData.personas) {
+        const selectedPersonas = new Set<string>()
+        backendData.personas.forEach((description: string) => {
+          const persona = data.personas.find(p => p.description === description)
+          if (persona) {
+            selectedPersonas.add(persona.id)
+          }
+        })
+        frontendData.selectedPersonas = selectedPersonas
+      }
+
+      updateData(frontendData)
+      console.log('✅ Onboarding data loaded from backend')
+    } catch (err) {
+      console.error('❌ Failed to load onboarding data:', err)
+      setError(err instanceof Error ? err.message : 'Failed to load data')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
-    <OnboardingContext.Provider value={{ data, updateData, resetData }}>
+    <OnboardingContext.Provider value={{ 
+      data, 
+      updateData, 
+      resetData, 
+      saveToBackend, 
+      loadFromBackend,
+      isLoading,
+      error
+    }}>
       {children}
     </OnboardingContext.Provider>
   )

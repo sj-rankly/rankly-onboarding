@@ -1,13 +1,13 @@
 # 📚 How to Use the Backend Documentation
 
-I've created **3 comprehensive documents** to help you build the backend for Rankly. Here's how to use them:
+I've created **4 comprehensive documents** to help you build the backend for Rankly. Here's how to use them:
 
 ---
 
 ## 📄 Documents Overview
 
 ### 1. **BACKEND_REQUIREMENTS.md** (Detailed)
-**📖 Length**: ~2,500 lines  
+**📖 Length**: ~1,450 lines  
 **⏱️ Read Time**: 30-45 minutes  
 **🎯 Purpose**: Complete technical specifications
 
@@ -80,6 +80,29 @@ I've created **3 comprehensive documents** to help you build the backend for Ran
 
 ---
 
+### 4. **OPENROUTER_IMPLEMENTATION.md** (Multi-LLM Integration) 🚀
+**📖 Length**: ~700 lines  
+**⏱️ Read Time**: 15-20 minutes  
+**🎯 Purpose**: Learn how to implement multi-LLM testing
+
+**Use this when**:
+- Implementing LLM integration
+- Want to test prompts across multiple models
+- Need brand visibility tracking code
+- Setting up sentiment analysis
+- Understanding cost management
+
+**What's inside**:
+- ✅ Why OpenRouter for multi-LLM platforms
+- ✅ Complete implementation examples
+- ✅ Brand analysis service (full code)
+- ✅ Cost estimation & tracking
+- ✅ Available models (GPT-4, Claude, Gemini, Perplexity, etc.)
+- ✅ Error handling & retries
+- ✅ Usage limits & rate limiting
+
+---
+
 ## 🎯 Recommended Reading Order
 
 ### First Time? Start Here:
@@ -95,7 +118,12 @@ I've created **3 comprehensive documents** to help you build the backend for Ran
 - Study database schemas
 - Plan your approach
 
-**Step 3**: Use `BACKEND_CHECKLIST.md` (during development)
+**Step 3**: Read `OPENROUTER_IMPLEMENTATION.md` (15 mins)
+- Understand multi-LLM integration
+- See complete code examples
+- Learn cost management
+
+**Step 4**: Use `BACKEND_CHECKLIST.md` (during development)
 - Check off items as you complete them
 - Follow the phase-by-phase guide
 - Track your progress

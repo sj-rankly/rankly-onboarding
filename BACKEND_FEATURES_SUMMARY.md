@@ -180,7 +180,7 @@ PORT=5000
 FRONTEND_URL=http://localhost:3000
 
 # Database
-MONGODB_URI=mongodb://localhost:27017/rankly
+MONGODB_URI=mongodb+srv://sj:jfdEhSrbJLvmlxjM@cluster0.ecjtsql.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 
 # JWT
 JWT_SECRET=your_jwt_secret
@@ -195,12 +195,17 @@ GOOGLE_CLIENT_ID=your_client_id
 GOOGLE_CLIENT_SECRET=your_secret
 GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
 
-# OpenAI
-OPENAI_API_KEY=your_openai_key
+# OpenRouter (RECOMMENDED for multi-LLM platform)
+OPENROUTER_API_KEY=your_openrouter_key
+OPENROUTER_REFERER=https://rankly.ai
+OPENROUTER_APP_NAME=Rankly
+
+# Alternative: Direct LLM APIs (if not using OpenRouter)
+# OPENAI_API_KEY=your_openai_key
+# ANTHROPIC_API_KEY=your_anthropic_key
+# GOOGLE_AI_API_KEY=your_google_ai_key
 
 # Optional
-ANTHROPIC_API_KEY=your_anthropic_key
-GOOGLE_AI_API_KEY=your_google_ai_key
 SENTRY_DSN=your_sentry_dsn
 ```
 
@@ -215,6 +220,8 @@ npm install express mongoose jsonwebtoken bcryptjs passport passport-google-oaut
 
 npm install -D typescript @types/node @types/express nodemon ts-node
 ```
+
+**Note**: `openai` package works with both OpenAI API and OpenRouter. Since Rankly is a multi-LLM platform, **use OpenRouter** for unified access to GPT-4, Claude, Gemini, Perplexity, and 100+ other models with a single API. See `OPENROUTER_IMPLEMENTATION.md` for details.
 
 ---
 

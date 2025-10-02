@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useOnboarding } from '../contexts/OnboardingContext'
+import { useAuth } from '../contexts/AuthContext'
 import { ThemeToggle } from '../components/ThemeToggle'
+import { LoginForm } from '../components/LoginForm'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Card, CardContent } from '../components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar'
 
+
 function Onboarding() {
   const navigate = useNavigate()
   const { data, updateData } = useOnboarding()
-  const [currentStep, setCurrentStep] = useState(1)
+  const { isAuthenticated } = useAuth()
+  const [currentStep, setCurrentStep] = useState(4) // Start at step 4 (website URL) instead of step 1 (personal info)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
 
   // Local state for forms
@@ -185,7 +189,7 @@ function Onboarding() {
         return
       }
 
-      const timers: NodeJS.Timeout[] = []
+      const timers: number[] = []
       
       // Card 1
       timers.push(setTimeout(() => {
@@ -701,7 +705,7 @@ function Onboarding() {
     )
   }
 
-  // Step 1: Email Input
+  // Step 1: Email Input (UNUSED - removed from flow)
   const EmailStep = () => {
     const [email, setEmail] = useState(data.email)
     const [emailError, setEmailError] = useState('')
@@ -780,7 +784,7 @@ function Onboarding() {
     )
   }
 
-  // Step 2: Email Verification
+  // Step 2: Email Verification (UNUSED - removed from flow)
   const VerificationStep = () => {
     const [codes, setCodes] = useState(['', '', '', '', '', ''])
 
@@ -863,6 +867,7 @@ function Onboarding() {
   }
 
   // Step 3: User Information
+  // UNUSED - removed from flow
   const UserInfoStep = () => {
     const [firstName, setFirstName] = useState(data.firstName)
     const [lastName, setLastName] = useState(data.lastName)
@@ -964,14 +969,6 @@ function Onboarding() {
           </div>
           <div className="flex gap-3">
             <Button 
-              variant="outline"
-              className="w-fit px-8" 
-              size="lg"
-              onClick={() => setCurrentStep(3)}
-            >
-              ← Back
-            </Button>
-            <Button 
               className="flex-1" 
               size="lg"
               onClick={handleAnalyze}
@@ -987,15 +984,12 @@ function Onboarding() {
 
   const renderStep = () => {
     switch (currentStep) {
-      case 1: return <EmailStep />
-      case 2: return <VerificationStep />
-      case 3: return <UserInfoStep />
-      case 4: return <CampaignStep />
+      case 4: return <CampaignStep /> // Website URL step
       case 5: return <CompetitorsList />
       case 6: return <Topics />
       case 7: return <UserPersonas />
       case 8: return <RegionLanguage />
-      default: return <EmailStep />
+      default: return <CampaignStep /> // Default to website URL step
     }
   }
 
@@ -1266,7 +1260,11 @@ function Onboarding() {
         <div className="p-8 flex items-center justify-center h-full">
           <div className="w-full max-w-md">
             <div className="space-y-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
-              {renderStep()}
+              {!isAuthenticated ? (
+                <LoginForm />
+              ) : (
+                renderStep()
+              )}
             </div>
           </div>
         </div>

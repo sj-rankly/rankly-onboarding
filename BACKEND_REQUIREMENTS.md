@@ -1099,18 +1099,51 @@ Response: {
 - Password reset
 - Weekly reports (future)
 
-### 8.2 LLM APIs
-**Purpose**: Generate prompts, analyze websites, test prompts  
-**Required**:
-- OpenAI API (GPT-4, GPT-3.5)
-- Anthropic API (Claude) - optional
-- Google AI API (Gemini) - optional
+### 8.2 LLM APIs - RECOMMENDED: OpenRouter
+**Purpose**: Multi-LLM testing, prompt generation, website analysis  
+
+**🎯 RECOMMENDED: OpenRouter (Unified API)**
+- **Why**: Rankly is a multi-LLM GEO/AEO metrics platform
+- **Benefit**: Test prompts across ALL major LLMs with single API
+- **Models Available**: 100+ including:
+  - OpenAI (GPT-4, GPT-3.5-turbo)
+  - Anthropic (Claude 3 Opus, Sonnet, Haiku)
+  - Google (Gemini Pro, Gemini Flash)
+  - Perplexity (Sonar models with web search)
+  - Meta (Llama 3 70B, 405B)
+  - Mistral (Large, Medium)
+  - Cohere (Command R+)
+- **Unified format**: OpenAI-compatible API
+- **Single API key**: No need for 5+ separate keys
+- **Cost tracking**: All spending in one dashboard
+- **Automatic fallbacks**: If one model fails, try another
+
+**Setup**:
+```javascript
+import OpenAI from 'openai'
+
+const openrouter = new OpenAI({
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: process.env.OPENROUTER_API_KEY,
+  defaultHeaders: {
+    "HTTP-Referer": "https://rankly.ai",
+    "X-Title": "Rankly"
+  }
+})
+```
+
+**Alternative: Direct SDKs** (If you need provider-specific features)
+- OpenAI SDK - for GPT-4 specific features
+- Anthropic SDK - for Claude-specific features
+- Google AI SDK - for Gemini-specific features
 
 **Usage**:
-- Website analysis
-- Prompt generation
-- Prompt testing
-- Content recommendations
+- Website analysis → Use GPT-4 or Claude 3
+- Prompt generation → Use GPT-4 or Claude 3
+- Multi-LLM testing → Test across ALL models
+- Brand visibility tracking → Query all major LLMs
+- Sentiment analysis → Compare sentiment across platforms
+- Citation tracking → Check which LLMs cite your brand
 
 ### 8.3 OAuth Providers
 **Purpose**: Social login  
@@ -1237,7 +1270,7 @@ PORT=5000
 FRONTEND_URL=http://localhost:3000
 
 # Database
-MONGODB_URI=mongodb://localhost:27017/rankly
+MONGODB_URI=mongodb+srv://sj:jfdEhSrbJLvmlxjM@cluster0.ecjtsql.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 
 # JWT
 JWT_SECRET=your_super_secret_jwt_key
@@ -1253,15 +1286,15 @@ GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
 
-# OpenAI
-OPENAI_API_KEY=your_openai_api_key
-OPENAI_ORG_ID=your_org_id (optional)
+# OpenRouter (RECOMMENDED - Multi-LLM API)
+OPENROUTER_API_KEY=your_openrouter_api_key
+OPENROUTER_REFERER=https://rankly.ai
+OPENROUTER_APP_NAME=Rankly
 
-# Anthropic (optional)
-ANTHROPIC_API_KEY=your_anthropic_api_key
-
-# Google AI (optional)
-GOOGLE_AI_API_KEY=your_google_ai_api_key
+# Alternative: Direct LLM APIs (if not using OpenRouter)
+# OPENAI_API_KEY=your_openai_api_key
+# ANTHROPIC_API_KEY=your_anthropic_api_key
+# GOOGLE_AI_API_KEY=your_google_ai_api_key
 
 # Sentry (optional)
 SENTRY_DSN=your_sentry_dsn
@@ -1312,6 +1345,12 @@ RATE_LIMIT_MAX_REQUESTS=100
   }
 }
 ```
+
+**Note on Dependencies**:
+- `openai` package is used for **both** OpenAI API and OpenRouter
+- OpenRouter uses OpenAI-compatible format, so same SDK works
+- No need for separate `@anthropic-ai/sdk` or `@google/generative-ai` when using OpenRouter
+- This keeps dependencies minimal and code consistent
 
 ---
 
