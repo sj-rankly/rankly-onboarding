@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Switch } from './ui/switch'
+import { ThemeToggle } from './ThemeToggle'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -8,24 +8,8 @@ interface LayoutProps {
 }
 
 function Layout({ children, showNav = true }: LayoutProps) {
-  const [isDark, setIsDark] = useState(true)
   const location = useLocation()
-
-  // Initialize theme
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme')
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const initialDark = savedTheme === 'dark' || (!savedTheme && prefersDark)
-    setIsDark(initialDark)
-    document.documentElement.classList.toggle('dark', initialDark)
-  }, [])
-
-  const toggleTheme = () => {
-    const newDark = !isDark
-    setIsDark(newDark)
-    document.documentElement.classList.toggle('dark', newDark)
-    localStorage.setItem('theme', newDark ? 'dark' : 'light')
-  }
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
   const isOnboarding = location.pathname === '/' || location.pathname === '/onboarding'
 
@@ -35,10 +19,22 @@ function Layout({ children, showNav = true }: LayoutProps) {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex relative">
+      {/* Mobile sidebar backdrop */}
+      {showNav && !isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(true)}
+        />
+      )}
+      
       {/* Left Sidebar */}
       {showNav && (
-        <div className="w-64 border-r border-border bg-background p-6 flex flex-col">
+        <div className={`
+          w-64 border-r border-border bg-background p-6 flex flex-col
+          fixed lg:static inset-y-0 left-0 z-50 transform transition-transform duration-300
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}>
           <div className="space-y-2 flex-1">
             <Link
               to="/dashboard"
@@ -74,15 +70,13 @@ function Layout({ children, showNav = true }: LayoutProps) {
           
           {/* Bottom Section */}
           <div className="mt-auto pt-6 space-y-4">
-            <div className="flex items-center gap-2 py-4">
-              <span className="text-sm text-muted-foreground">Light</span>
-              <Switch
-                checked={isDark}
-                onCheckedChange={toggleTheme}
-              />
-              <span className="text-sm text-muted-foreground">Dark</span>
+            <div className="py-4">
+              <ThemeToggle />
             </div>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+            <a 
+              href="mailto:sj@tryrankly.com" 
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2"
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
@@ -98,6 +92,18 @@ function Layout({ children, showNav = true }: LayoutProps) {
         <header className="border-b border-border bg-background px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
+              {/* Hamburger menu for mobile */}
+              {showNav && (
+                <button
+                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                  className="lg:hidden p-2 hover:bg-muted rounded-md transition-colors"
+                  aria-label="Toggle sidebar"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+              )}
               <Link to="/" className="text-2xl font-black tracking-tight text-foreground font-logo">
                 Rankly
               </Link>
@@ -105,21 +111,14 @@ function Layout({ children, showNav = true }: LayoutProps) {
             
             {!showNav && (
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Light</span>
-                  <Switch
-                    checked={isDark}
-                    onCheckedChange={toggleTheme}
-                  />
-                  <span className="text-sm text-muted-foreground">Dark</span>
-                </div>
+                <ThemeToggle />
               </div>
             )}
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 bg-background">
+        <main className="flex-1 bg-background overflow-x-hidden">
           {children}
         </main>
       </div>

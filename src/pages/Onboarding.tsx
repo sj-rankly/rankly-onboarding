@@ -1,207 +1,166 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useOnboarding } from '../contexts/OnboardingContext'
+import { ThemeToggle } from '../components/ThemeToggle'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Card, CardContent } from '../components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar'
 
-// Types
-interface Competitor {
-  id: string
-  name: string
-  url: string
-}
-
-interface Persona {
-  id: string
-  type: string
-  description: string
-}
-
-interface Topic {
-  id: string
-  name: string
-}
-
 function Onboarding() {
   const navigate = useNavigate()
+  const { data, updateData } = useOnboarding()
   const [currentStep, setCurrentStep] = useState(1)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
 
-  // Competitors state
-  const [competitors, setCompetitors] = useState<Competitor[]>([
-    { id: '1', name: 'Competitor 1', url: 'https://competitor1.com' },
-    { id: '2', name: 'Competitor 2', url: 'https://competitor2.com' },
-    { id: '3', name: 'Competitor 3', url: 'https://competitor3.com' },
-    { id: '4', name: 'Competitor 4', url: 'https://competitor4.com' }
-  ])
-  const [selectedCompetitors, setSelectedCompetitors] = useState<Set<string>>(new Set())
-
-  // Add competitor form state
-  const [showAddForm, setShowAddForm] = useState(false)
+  // Local state for forms
+  const [showAddCompForm, setShowAddCompForm] = useState(false)
   const [newCompetitorName, setNewCompetitorName] = useState('')
   const [newCompetitorUrl, setNewCompetitorUrl] = useState('')
 
-  // Personas state
-  const [personas, setPersonas] = useState<Persona[]>([
-    { 
-      id: '1', 
-      type: 'Marketer', 
-      description: 'This persona represents marketing professionals who are looking to optimize their content strategy and improve their SEO performance through AI-powered tools.' 
-    },
-    { 
-      id: '2', 
-      type: 'Developer', 
-      description: 'This persona represents developers and technical professionals who need to integrate AI solutions into their existing workflows and systems.' 
-    },
-    { 
-      id: '3', 
-      type: 'Executive', 
-      description: 'This persona represents C-level executives and decision makers who are focused on ROI, business growth, and strategic implementation of new technologies.' 
-    }
-  ])
-  const [selectedPersonas, setSelectedPersonas] = useState<Set<string>>(new Set())
-
-  // Add persona form state
   const [showAddPersonaForm, setShowAddPersonaForm] = useState(false)
   const [newPersonaType, setNewPersonaType] = useState('')
   const [newPersonaDescription, setNewPersonaDescription] = useState('')
 
-  // Topics state
-  const [topics, setTopics] = useState<Topic[]>([
-    { id: '1', name: 'Topic 1' },
-    { id: '2', name: 'Topic 2' },
-    { id: '3', name: 'Topic 3' }
-  ])
-  const [selectedTopics, setSelectedTopics] = useState<Set<string>>(new Set())
-
-  // Add topic form state
   const [showAddTopicForm, setShowAddTopicForm] = useState(false)
   const [newTopicName, setNewTopicName] = useState('')
 
-  // Region & Language state
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false)
   const [showMetrics, setShowMetrics] = useState(false)
 
-  // Competitor management functions
+  // Validation helpers
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  }
+
+  const isValidURL = (url: string) => {
+    try {
+      new URL(url)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  // Competitor management
   const updateCompetitorUrl = (id: string, newUrl: string) => {
-    setCompetitors(prev => prev.map(comp => 
+    const updatedCompetitors = data.competitors.map(comp => 
       comp.id === id ? { ...comp, url: newUrl } : comp
-    ))
+    )
+    updateData({ competitors: updatedCompetitors })
   }
 
   const toggleCompetitorSelection = (id: string) => {
-    setSelectedCompetitors(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(id)) {
-        newSet.delete(id)
-      } else {
-        newSet.add(id)
-      }
-      return newSet
-    })
+    const newSet = new Set(data.selectedCompetitors)
+    if (newSet.has(id)) {
+      newSet.delete(id)
+    } else {
+      newSet.add(id)
+    }
+    updateData({ selectedCompetitors: newSet })
   }
 
   const removeCompetitor = (id: string) => {
-    setSelectedCompetitors(prev => {
-      const newSet = new Set(prev)
-      newSet.delete(id)
-      return newSet
+    const newSelected = new Set(data.selectedCompetitors)
+    newSelected.delete(id)
+    updateData({
+      competitors: data.competitors.filter(comp => comp.id !== id),
+      selectedCompetitors: newSelected
     })
-    setCompetitors(prev => prev.filter(comp => comp.id !== id))
   }
 
   const addCompetitor = () => {
     if (newCompetitorName.trim() && newCompetitorUrl.trim()) {
-      const newCompetitor: Competitor = {
+      if (!isValidURL(newCompetitorUrl)) {
+        alert('Please enter a valid URL')
+        return
+      }
+      const newCompetitor = {
         id: Date.now().toString(),
         name: newCompetitorName.trim(),
         url: newCompetitorUrl.trim()
       }
-      setCompetitors(prev => [...prev, newCompetitor])
+      updateData({ competitors: [...data.competitors, newCompetitor] })
       setNewCompetitorName('')
       setNewCompetitorUrl('')
-      setShowAddForm(false)
+      setShowAddCompForm(false)
     }
   }
 
-  // Persona management functions
+  // Persona management
   const updatePersonaDescription = (id: string, newDescription: string) => {
-    setPersonas(prev => prev.map(persona => 
+    const updatedPersonas = data.personas.map(persona => 
       persona.id === id ? { ...persona, description: newDescription } : persona
-    ))
+    )
+    updateData({ personas: updatedPersonas })
   }
 
   const togglePersonaSelection = (id: string) => {
-    setSelectedPersonas(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(id)) {
-        newSet.delete(id)
-      } else {
-        newSet.add(id)
-      }
-      return newSet
-    })
+    const newSet = new Set(data.selectedPersonas)
+    if (newSet.has(id)) {
+      newSet.delete(id)
+    } else {
+      newSet.add(id)
+    }
+    updateData({ selectedPersonas: newSet })
   }
 
   const removePersona = (id: string) => {
-    setSelectedPersonas(prev => {
-      const newSet = new Set(prev)
-      newSet.delete(id)
-      return newSet
+    const newSelected = new Set(data.selectedPersonas)
+    newSelected.delete(id)
+    updateData({
+      personas: data.personas.filter(persona => persona.id !== id),
+      selectedPersonas: newSelected
     })
-    setPersonas(prev => prev.filter(persona => persona.id !== id))
   }
 
   const addPersona = () => {
     if (newPersonaType.trim() && newPersonaDescription.trim()) {
-      const newPersona: Persona = {
+      const newPersona = {
         id: Date.now().toString(),
         type: newPersonaType.trim(),
         description: newPersonaDescription.trim()
       }
-      setPersonas(prev => [...prev, newPersona])
+      updateData({ personas: [...data.personas, newPersona] })
       setNewPersonaType('')
       setNewPersonaDescription('')
       setShowAddPersonaForm(false)
     }
   }
 
-  // Topic management functions
+  // Topic management
   const toggleTopicSelection = (id: string) => {
-    setSelectedTopics(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(id)) {
-        newSet.delete(id)
-      } else {
-        newSet.add(id)
-      }
-      return newSet
-    })
+    const newSet = new Set(data.selectedTopics)
+    if (newSet.has(id)) {
+      newSet.delete(id)
+    } else {
+      newSet.add(id)
+    }
+    updateData({ selectedTopics: newSet })
   }
 
   const removeTopic = (id: string) => {
-    setSelectedTopics(prev => {
-      const newSet = new Set(prev)
-      newSet.delete(id)
-      return newSet
+    const newSelected = new Set(data.selectedTopics)
+    newSelected.delete(id)
+    updateData({
+      topics: data.topics.filter(topic => topic.id !== id),
+      selectedTopics: newSelected
     })
-    setTopics(prev => prev.filter(topic => topic.id !== id))
   }
 
   const addTopic = () => {
     if (newTopicName.trim()) {
-      const newTopic: Topic = {
+      const newTopic = {
         id: Date.now().toString(),
         name: newTopicName.trim()
       }
-      setTopics(prev => [...prev, newTopic])
+      updateData({ topics: [...data.topics, newTopic] })
       setNewTopicName('')
       setShowAddTopicForm(false)
     }
   }
 
-  // Loading Cards Component
+  // Loading Cards Component with proper cleanup
   const LoadingCards = () => {
     const [card1Visible, setCard1Visible] = useState(false)
     const [card2Visible, setCard2Visible] = useState(false)
@@ -225,30 +184,37 @@ function Onboarding() {
         setCard4Loaded(false)
         return
       }
+
+      const timers: NodeJS.Timeout[] = []
       
-      // Show card 1 immediately
-      setTimeout(() => {
+      // Card 1
+      timers.push(setTimeout(() => {
         setCard1Visible(true)
-        setTimeout(() => setCard1Loaded(true), 2000)
-      }, 100)
+        timers.push(setTimeout(() => setCard1Loaded(true), 2000))
+      }, 100))
 
-      // Show card 2
-      setTimeout(() => {
+      // Card 2
+      timers.push(setTimeout(() => {
         setCard2Visible(true)
-        setTimeout(() => setCard2Loaded(true), 2000)
-      }, 2500)
+        timers.push(setTimeout(() => setCard2Loaded(true), 2000))
+      }, 2500))
 
-      // Show card 3
-      setTimeout(() => {
+      // Card 3
+      timers.push(setTimeout(() => {
         setCard3Visible(true)
-        setTimeout(() => setCard3Loaded(true), 2000)
-      }, 5000)
+        timers.push(setTimeout(() => setCard3Loaded(true), 2000))
+      }, 5000))
 
-      // Show card 4
-      setTimeout(() => {
+      // Card 4
+      timers.push(setTimeout(() => {
         setCard4Visible(true)
-        setTimeout(() => setCard4Loaded(true), 2000)
-      }, 7500)
+        timers.push(setTimeout(() => setCard4Loaded(true), 2000))
+      }, 7500))
+
+      // Cleanup function
+      return () => {
+        timers.forEach(timer => clearTimeout(timer))
+      }
     }, [isAnalyzing])
 
     const steps = [
@@ -307,7 +273,7 @@ function Onboarding() {
           <div className="mt-12 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
             <Button 
               size="lg"
-              className="h-12 px-8 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="h-12 px-8 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90"
               onClick={() => {
                 setIsAnalyzing(false)
                 setCurrentStep(5)
@@ -325,14 +291,23 @@ function Onboarding() {
   const CompetitorsList = () => {
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-h3 font-heading">Competitors</h2>
-          <p className="text-body text-muted-foreground">Manage your competitor list for analysis</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-h3 font-heading">Competitors</h2>
+            <p className="text-body text-muted-foreground">Manage your competitor list for analysis</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentStep(4)}
+          >
+            ← Back
+          </Button>
         </div>
 
         <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
-          {competitors.map((competitor) => {
-            const isSelected = selectedCompetitors.has(competitor.id)
+          {data.competitors.map((competitor) => {
+            const isSelected = data.selectedCompetitors.has(competitor.id)
             return (
               <div
                 key={competitor.id}
@@ -366,7 +341,6 @@ function Onboarding() {
                     removeCompetitor(competitor.id)
                   }}
                   className="flex-shrink-0 text-foreground hover:bg-muted"
-                  style={{ color: 'inherit' }}
                 >
                   ×
                 </Button>
@@ -374,7 +348,7 @@ function Onboarding() {
             )
           })}
 
-          {showAddForm ? (
+          {showAddCompForm ? (
             <div className="bg-card border border-border rounded-lg p-4 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <Input
@@ -400,7 +374,7 @@ function Onboarding() {
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    setShowAddForm(false)
+                    setShowAddCompForm(false)
                     setNewCompetitorName('')
                     setNewCompetitorUrl('')
                   }}
@@ -413,7 +387,7 @@ function Onboarding() {
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => setShowAddForm(true)}
+              onClick={() => setShowAddCompForm(true)}
             >
               + Add Competitor
             </Button>
@@ -427,14 +401,23 @@ function Onboarding() {
   const Topics = () => {
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-h3 font-heading">Topics</h2>
-          <p className="text-body text-muted-foreground">Select topics to generate prompts</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-h3 font-heading">Topics</h2>
+            <p className="text-body text-muted-foreground">Select topics to generate prompts</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentStep(5)}
+          >
+            ← Back
+          </Button>
         </div>
 
         <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
-          {topics.map((topic) => {
-            const isSelected = selectedTopics.has(topic.id)
+          {data.topics.map((topic) => {
+            const isSelected = data.selectedTopics.has(topic.id)
             return (
               <div
                 key={topic.id}
@@ -459,7 +442,6 @@ function Onboarding() {
                     removeTopic(topic.id)
                   }}
                   className="flex-shrink-0 text-foreground hover:bg-muted"
-                  style={{ color: 'inherit' }}
                 >
                   ×
                 </Button>
@@ -514,6 +496,7 @@ function Onboarding() {
       setIsGeneratingPrompts(true)
       setShowMetrics(false)
       
+      // Simulate API call
       setTimeout(() => {
         setIsGeneratingPrompts(false)
         setShowMetrics(true)
@@ -525,13 +508,26 @@ function Onboarding() {
         <div className="space-y-6">
           <div className="bg-card border border-border rounded-lg p-6 text-center">
             <h2 className="text-h3 font-heading mb-4">View Dashboard for more insights</h2>
-            <Button
-              size="lg"
-              className="w-full"
-              onClick={() => navigate('/dashboard')}
-            >
-              Open Dashboard →
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex-1"
+                onClick={() => {
+                  setShowMetrics(false)
+                  setIsGeneratingPrompts(false)
+                }}
+              >
+                ← Back
+              </Button>
+              <Button
+                size="lg"
+                className="flex-1"
+                onClick={() => navigate('/dashboard')}
+              >
+                Open Dashboard →
+              </Button>
+            </div>
           </div>
         </div>
       )
@@ -539,12 +535,21 @@ function Onboarding() {
 
     return (
       <div className="space-y-6">
-        <div className="bg-card border border-border rounded-lg p-6 flex flex-col gap-4">
+        <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-h3 font-heading mb-2">Region & Language</h2>
-            <p className="text-body text-muted-foreground">Select your target region and language for prompt generation</p>
+            <h2 className="text-h3 font-heading">Region & Language</h2>
+            <p className="text-body text-muted-foreground">Select your target region and language</p>
           </div>
-
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentStep(7)}
+          >
+            ← Back
+          </Button>
+        </div>
+        
+        <div className="bg-card border border-border rounded-lg p-6 flex flex-col gap-4">
           <div className="space-y-4">
             <div>
               <label className="block text-caption text-foreground mb-2">Region</label>
@@ -590,14 +595,23 @@ function Onboarding() {
   const UserPersonas = () => {
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-h3 font-heading">User Personas</h2>
-          <p className="text-body text-muted-foreground">Select personas to generate prompts</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-h3 font-heading">User Personas</h2>
+            <p className="text-body text-muted-foreground">Select personas to generate prompts</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentStep(6)}
+          >
+            ← Back
+          </Button>
         </div>
 
         <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
-          {personas.map((persona) => {
-            const isSelected = selectedPersonas.has(persona.id)
+          {data.personas.map((persona) => {
+            const isSelected = data.selectedPersonas.has(persona.id)
             return (
               <div
                 key={persona.id}
@@ -622,7 +636,6 @@ function Onboarding() {
                       removePersona(persona.id)
                     }}
                     className="flex-shrink-0 text-foreground hover:bg-muted"
-                    style={{ color: 'inherit' }}
                   >
                     ×
                   </Button>
@@ -690,12 +703,16 @@ function Onboarding() {
 
   // Step 1: Email Input
   const EmailStep = () => {
-    const [email, setEmail] = useState('')
+    const [email, setEmail] = useState(data.email)
+    const [emailError, setEmailError] = useState('')
 
     const handleContinue = () => {
-      if (email.includes('@') && email.length > 5) {
-        setCurrentStep(2)
+      if (!isValidEmail(email)) {
+        setEmailError('Please enter a valid email address')
+        return
       }
+      updateData({ email })
+      setCurrentStep(2)
     }
 
     const handleGoogleLogin = () => {
@@ -714,7 +731,7 @@ function Onboarding() {
         <div className="space-y-4">
           <Button 
             variant="outline"
-            className="w-full h-12 border border-input bg-background hover:bg-muted text-foreground"
+            className="w-full h-12"
             onClick={handleGoogleLogin}
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -741,16 +758,20 @@ function Onboarding() {
               type="email" 
               placeholder="name@company.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              className="h-12"
+              onChange={(e) => {
+                setEmail(e.target.value)
+                setEmailError('')
+              }}
+              className={`h-12 ${emailError ? 'border-red-500' : ''}`}
             />
+            {emailError && (
+              <p className="text-sm text-red-500">{emailError}</p>
+            )}
           </div>
           
           <Button 
             className="w-full h-12 bg-foreground text-background hover:bg-foreground/90" 
             onClick={handleContinue}
-            disabled={!email.includes('@') || email.length < 5}
           >
             Continue
           </Button>
@@ -819,7 +840,15 @@ function Onboarding() {
           ))}
         </div>
         
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-3">
+          <Button 
+            variant="outline"
+            className="w-fit px-8" 
+            size="lg"
+            onClick={() => setCurrentStep(1)}
+          >
+            ← Back
+          </Button>
           <Button 
             className="w-fit px-8" 
             size="lg"
@@ -835,12 +864,13 @@ function Onboarding() {
 
   // Step 3: User Information
   const UserInfoStep = () => {
-    const [firstName, setFirstName] = useState('')
-    const [lastName, setLastName] = useState('')
-    const [companyName, setCompanyName] = useState('')
+    const [firstName, setFirstName] = useState(data.firstName)
+    const [lastName, setLastName] = useState(data.lastName)
+    const [companyName, setCompanyName] = useState(data.companyName)
 
     const handleContinue = () => {
       if (firstName && lastName && companyName) {
+        updateData({ firstName, lastName, companyName })
         setCurrentStep(4)
       }
     }
@@ -870,14 +900,24 @@ function Onboarding() {
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
           />
-          <Button 
-            className="w-full" 
-            size="lg"
-            onClick={handleContinue}
-            disabled={!firstName || !lastName || !companyName}
-          >
-            Continue
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              variant="outline"
+              className="w-fit px-8" 
+              size="lg"
+              onClick={() => setCurrentStep(2)}
+            >
+              ← Back
+            </Button>
+            <Button 
+              className="flex-1" 
+              size="lg"
+              onClick={handleContinue}
+              disabled={!firstName || !lastName || !companyName}
+            >
+              Continue
+            </Button>
+          </div>
         </div>
       </div>
     )
@@ -885,12 +925,19 @@ function Onboarding() {
 
   // Step 4: Campaign Setup
   const CampaignStep = () => {
-    const [url, setUrl] = useState('')
+    const [url, setUrl] = useState(data.websiteUrl)
+    const [urlError, setUrlError] = useState('')
 
     const handleAnalyze = () => {
-      if (url) {
-        setIsAnalyzing(true)
+      if (!url) return
+      
+      if (!isValidURL(url)) {
+        setUrlError('Please enter a valid URL (e.g., https://example.com)')
+        return
       }
+
+      updateData({ websiteUrl: url })
+      setIsAnalyzing(true)
     }
 
     return (
@@ -900,20 +947,39 @@ function Onboarding() {
         </div>
         
         <div className="space-y-4">
-          <Input 
-            type="url"
-            placeholder="https://example.com"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-          <Button 
-            className="w-full" 
-            size="lg"
-            onClick={handleAnalyze}
-            disabled={!url || isAnalyzing}
-          >
-            {isAnalyzing ? 'Analyzing...' : 'Analyze →'}
-          </Button>
+          <div className="space-y-2">
+            <Input 
+              type="url"
+              placeholder="https://example.com"
+              value={url}
+              onChange={(e) => {
+                setUrl(e.target.value)
+                setUrlError('')
+              }}
+              className={urlError ? 'border-red-500' : ''}
+            />
+            {urlError && (
+              <p className="text-sm text-red-500">{urlError}</p>
+            )}
+          </div>
+          <div className="flex gap-3">
+            <Button 
+              variant="outline"
+              className="w-fit px-8" 
+              size="lg"
+              onClick={() => setCurrentStep(3)}
+            >
+              ← Back
+            </Button>
+            <Button 
+              className="flex-1" 
+              size="lg"
+              onClick={handleAnalyze}
+              disabled={!url || isAnalyzing}
+            >
+              {isAnalyzing ? 'Analyzing...' : 'Analyze →'}
+            </Button>
+          </div>
         </div>
       </div>
     )
@@ -941,42 +1007,75 @@ function Onboarding() {
 
     if (currentStep === 5) {
       return (
-        <div className="flex flex-col items-center justify-center h-full">
-          <Button
-            size="lg"
-            className="px-8 py-4 text-lg"
-            onClick={() => setCurrentStep(6)}
-          >
-            Next →
-          </Button>
+        <div className="flex flex-col items-center justify-center h-full gap-3">
+          <p className="text-muted-foreground mb-4">Select your competitors to continue</p>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              size="lg"
+              className="px-8 py-4 text-lg"
+              onClick={() => setCurrentStep(4)}
+            >
+              ← Back
+            </Button>
+            <Button
+              size="lg"
+              className="px-8 py-4 text-lg"
+              onClick={() => setCurrentStep(6)}
+            >
+              Next →
+            </Button>
+          </div>
         </div>
       )
     }
 
     if (currentStep === 6) {
       return (
-        <div className="flex flex-col items-center justify-center h-full">
-          <Button
-            size="lg"
-            className="px-8 py-4 text-lg"
-            onClick={() => setCurrentStep(7)}
-          >
-            Next →
-          </Button>
+        <div className="flex flex-col items-center justify-center h-full gap-3">
+          <p className="text-muted-foreground mb-4">Select your topics to continue</p>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              size="lg"
+              className="px-8 py-4 text-lg"
+              onClick={() => setCurrentStep(5)}
+            >
+              ← Back
+            </Button>
+            <Button
+              size="lg"
+              className="px-8 py-4 text-lg"
+              onClick={() => setCurrentStep(7)}
+            >
+              Next →
+            </Button>
+          </div>
         </div>
       )
     }
 
     if (currentStep === 7) {
       return (
-        <div className="flex flex-col items-center justify-center h-full">
-          <Button
-            size="lg"
-            className="px-8 py-4 text-lg"
-            onClick={() => setCurrentStep(8)}
-          >
-            Next →
-          </Button>
+        <div className="flex flex-col items-center justify-center h-full gap-3">
+          <p className="text-muted-foreground mb-4">Configure your personas to continue</p>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              size="lg"
+              className="px-8 py-4 text-lg"
+              onClick={() => setCurrentStep(6)}
+            >
+              ← Back
+            </Button>
+            <Button
+              size="lg"
+              className="px-8 py-4 text-lg"
+              onClick={() => setCurrentStep(8)}
+            >
+              Next →
+            </Button>
+          </div>
         </div>
       )
     }
@@ -1046,7 +1145,7 @@ function Onboarding() {
                 <div className="text-3xl text-metric text-foreground mb-2">85%</div>
                 <div className="text-caption text-foreground mb-1">Visibility Score</div>
                 <div className="text-label text-muted-foreground">
-                  How often your brand appears in AI-generated answers across selected platforms, topics, and personas
+                  How often your brand appears in AI-generated answers
                 </div>
               </div>
 
@@ -1054,7 +1153,7 @@ function Onboarding() {
                 <div className="text-3xl text-metric text-foreground mb-2">42%</div>
                 <div className="text-caption text-foreground mb-1">Citation Share</div>
                 <div className="text-label text-muted-foreground">
-                  Citation share over time and domain rankings for your brand
+                  Citation share over time and domain rankings
                 </div>
               </div>
 
@@ -1062,7 +1161,7 @@ function Onboarding() {
                 <div className="text-3xl text-metric text-foreground mb-2">12</div>
                 <div className="text-caption text-foreground mb-1">Opportunities</div>
                 <div className="text-label text-muted-foreground">
-                  How can you improve your brand's visibility on LLMs
+                  Improvement opportunities for LLM visibility
                 </div>
               </div>
             </div>
@@ -1147,6 +1246,22 @@ function Onboarding() {
           </h1>
         </div>
         
+        {/* Theme Toggle & Contact - Bottom Left */}
+        <div className="absolute bottom-6 left-6 z-10">
+          <div className="flex flex-col gap-3">
+            <a 
+              href="mailto:sj@tryrankly.com" 
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Contact us
+            </a>
+            <ThemeToggle />
+          </div>
+        </div>
+        
         {/* Main Content - Centered */}
         <div className="p-8 flex items-center justify-center h-full">
           <div className="w-full max-w-md">
@@ -1173,4 +1288,3 @@ function Onboarding() {
 }
 
 export default Onboarding
-
