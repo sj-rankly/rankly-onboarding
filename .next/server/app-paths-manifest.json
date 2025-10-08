@@ -1,0 +1,11 @@
+{
+  "/onboarding/website/page": "app/onboarding/website/page.js",
+  "/onboarding/competitors/page": "app/onboarding/competitors/page.js",
+  "/onboarding/topics/page": "app/onboarding/topics/page.js",
+  "/onboarding/personas/page": "app/onboarding/personas/page.js",
+  "/onboarding/llm-platforms/page": "app/onboarding/llm-platforms/page.js",
+  "/onboarding/results/page": "app/onboarding/results/page.js",
+  "/page": "app/page.js",
+  "/onboarding/signup/page": "app/onboarding/signup/page.js",
+  "/onboarding/signin/page": "app/onboarding/signin/page.js"
+}
