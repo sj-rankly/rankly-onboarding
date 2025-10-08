@@ -1,51 +1,77 @@
-# Rankly Onboarding - shadcn/ui
+# Rankly - Get More Traffic from LLMs
 
-A modern onboarding flow built with React, TypeScript, and shadcn/ui design system.
+A modern onboarding and analytics platform built with React, TypeScript, and shadcn/ui design system. Rankly helps you optimize your brand visibility across AI-powered platforms like ChatGPT, Claude, Gemini, and Perplexity.
 
 ## 🚀 Features
 
-- **shadcn/ui Components**: Modern, accessible UI components
+### Onboarding Flow
+- **Multi-step User Registration**: Email, verification, user info collection
+- **Google OAuth Integration**: Quick signup option
+- **Website Analysis**: Automated competitor, topic, and persona discovery
+- **Interactive Configuration**: Manage competitors, topics, and user personas
+- **Progress Tracking**: Visual feedback throughout the setup process
+
+### Dashboard
+- **Prompt Management**: Organize and manage AI prompts by topic
+- **Prompt Chaining Visualization**: See how prompts relate to each other
+- **Analytics Tabs**: Visibility, Sentiment, Topics, Citations (coming soon)
+- **Collapsible Topics**: Hierarchical organization of prompts
+- **Real-time Updates**: Add, edit, and delete prompts instantly
+
+### UI/UX
 - **Dark/Light Theme**: Toggle between themes with persistent storage
-- **Multi-step Flow**: Email → Verification → User Info → Campaign Setup
-- **TypeScript**: Full type safety
 - **Responsive Design**: Works on all screen sizes
-- **Modern Stack**: React 18, Vite, Tailwind CSS
+- **Modern Components**: shadcn/ui with Radix UI primitives
+- **Smooth Animations**: Tailwind CSS animations throughout
 
-## 📦 Dependencies
+## 📦 Tech Stack
 
-### Core Dependencies
-- **React 18**: Modern React with concurrent features
-- **TypeScript**: Type-safe development
-- **Vite**: Fast build tool and dev server
+### Core
+- **React 18**: Modern React with hooks and concurrent features
+- **TypeScript**: Full type safety across the application
+- **Vite**: Lightning-fast dev server and build tool
+- **React Router**: Client-side routing between pages
 
-### UI Dependencies
-- **shadcn/ui**: Modern component library
-- **Radix UI**: Accessible component primitives
+### UI & Styling
+- **shadcn/ui**: High-quality, accessible component system
+- **Radix UI**: Unstyled, accessible component primitives
 - **Tailwind CSS**: Utility-first CSS framework
-- **Lucide React**: Beautiful icons
+- **Lucide React**: Beautiful icon library
+- **class-variance-authority**: Component variant management
+- **tailwindcss-animate**: Animation utilities
 
-### Key shadcn/ui Components
-- `@radix-ui/react-*`: All Radix UI primitives
-- `class-variance-authority`: Component variant management
-- `clsx`: Conditional class names
-- `tailwind-merge`: Tailwind class merging
-- `tailwindcss-animate`: Animation utilities
+### Build Tools
+- **ESLint**: Code linting
+- **PostCSS**: CSS processing with Autoprefixer
+- **TypeScript**: Type checking
 
 ## 🛠️ Installation
 
-1. **Install dependencies**:
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd rankly-onboarding
+   ```
+
+2. **Install dependencies**:
    ```bash
    npm install --legacy-peer-deps
    ```
 
-2. **Start development server**:
+3. **Start development server**:
    ```bash
    npm run dev
    ```
+   The app will be available at `http://localhost:3000`
 
-3. **Build for production**:
+4. **Build for production**:
    ```bash
    npm run build
+   ```
+
+5. **Preview production build**:
+   ```bash
+   npm run preview
    ```
 
 ## 📁 Project Structure
@@ -54,88 +80,165 @@ A modern onboarding flow built with React, TypeScript, and shadcn/ui design syst
 rankly-onboarding/
 ├── src/
 │   ├── components/
-│   │   └── ui/           # shadcn/ui components
+│   │   ├── ui/              # shadcn/ui components
+│   │   │   ├── avatar.tsx
+│   │   │   ├── button.tsx
+│   │   │   ├── card.tsx
+│   │   │   ├── input.tsx
+│   │   │   ├── label.tsx
+│   │   │   ├── separator.tsx
+│   │   │   └── switch.tsx
+│   │   └── Layout.tsx       # Main layout with nav & theme toggle
+│   ├── pages/
+│   │   ├── Onboarding.tsx   # Multi-step onboarding flow
+│   │   └── Dashboard.tsx    # Main dashboard with prompt management
 │   ├── lib/
-│   │   └── utils.ts      # Utility functions
-│   ├── App.tsx           # Main application
-│   ├── main.tsx          # React entry point
-│   └── globals.css       # Global styles
-├── components.json       # shadcn/ui config
-├── tailwind.config.js    # Tailwind configuration
-├── vite.config.ts        # Vite configuration
-└── package.json          # Dependencies
+│   │   └── utils.ts         # Utility functions (cn helper)
+│   ├── App.tsx              # Main app with routing
+│   ├── main.tsx             # React entry point
+│   └── globals.css          # Global styles & theme variables
+├── components.json          # shadcn/ui configuration
+├── tailwind.config.js       # Tailwind configuration
+├── vite.config.ts           # Vite configuration
+├── tsconfig.json            # TypeScript configuration
+├── package.json             # Dependencies
+└── index.html               # HTML entry point
 ```
 
 ## 🎨 Design System
 
 ### Theme System
-- **CSS Variables**: HSL color space for better manipulation
-- **Dark Mode**: Automatic theme switching
+- **CSS Variables**: HSL color space for better color manipulation
+- **Dark Mode**: Class-based dark mode (`.dark`)
 - **Consistent Colors**: Primary, secondary, muted, destructive variants
+- **Custom Typography**: Inter font with custom heading scales
 
-### Components
-- **Button**: Primary, secondary, destructive variants
-- **Input**: Form inputs with focus states
-- **Card**: Content containers with shadows
-- **Badge**: Status indicators
-- **Switch**: Theme toggle component
+### Color Palette
+```css
+/* Light Mode */
+--background: 0 0% 100%
+--foreground: 0 0% 0%
+--primary: 0 0% 0%
+--muted: 0 0% 96%
+
+/* Dark Mode */
+--background: 0 0% 0%
+--foreground: 0 0% 100%
+--primary: 0 0% 100%
+--muted: 0 0% 15%
+```
 
 ### Typography
-- **Inter Font**: Modern, readable typeface
-- **Consistent Sizing**: Tailwind's type scale
-- **Proper Hierarchy**: Headings, body text, captions
+- **Font Family**: Inter (Google Fonts)
+- **Logo Font**: Quintessential
+- **Heading Scale**: h1 (48-64px), h2 (32-40px), h3 (24px)
+- **Body Text**: 16px with 1.5 line height
+
+## 🧩 Key Components
+
+### Onboarding Page
+- **EmailStep**: Email capture with Google OAuth
+- **VerificationStep**: 6-digit code verification
+- **UserInfoStep**: Name and company collection
+- **CampaignStep**: Website URL analysis
+- **LoadingCards**: Animated progress indicators
+- **CompetitorsList**: Manage competitor URLs
+- **Topics**: Topic selection and management
+- **UserPersonas**: Persona configuration
+- **RegionLanguage**: Region/language settings (currently fixed to Global/English)
+
+### Dashboard Page
+- **CollapsibleTopic**: Expandable topic sections
+- **PromptChaining**: Visual prompt relationship diagram
+- **Tab Navigation**: Switch between analytics views
+
+### Layout Component
+- **Sidebar Navigation**: Quick access to different sections
+- **Theme Toggle**: Persistent dark/light mode
+- **Contact Link**: Easy access to support
 
 ## 🔧 Development
 
-### Adding New Components
-```bash
-npx shadcn@latest add [component-name]
-```
-
 ### Available Scripts
-- `npm run dev` - Start development server
+- `npm run dev` - Start development server (port 3000)
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
 - `npm run type-check` - TypeScript type checking
 
-## 🌟 Key Features
+### Adding New shadcn/ui Components
+```bash
+npx shadcn@latest add [component-name]
+```
 
-### 1. Theme Management
-- Persistent theme storage
-- Smooth transitions
-- CSS variables for consistency
+Example:
+```bash
+npx shadcn@latest add dialog
+npx shadcn@latest add dropdown-menu
+```
 
-### 2. Form Validation
-- Real-time validation
-- Disabled states
-- User feedback
+### Code Style
+- Use TypeScript for all new files
+- Follow React hooks best practices
+- Use tailwind utility classes for styling
+- Maintain consistent component structure
 
-### 3. Responsive Design
-- Mobile-first approach
-- Flexible layouts
-- Consistent spacing
+## 🚦 Routing
 
-### 4. Accessibility
-- ARIA labels
-- Keyboard navigation
-- Screen reader support
+The application uses React Router v6:
 
-## 📱 Onboarding Flow
-
-1. **Email Input**: Collect user email
-2. **Email Verification**: 6-digit code verification
-3. **User Information**: Name and company details
-4. **Campaign Setup**: Website URL and campaign name
+```typescript
+/                  → Onboarding flow
+/onboarding        → Onboarding flow (same as /)
+/dashboard         → Main dashboard
+/*                 → Redirect to /
+```
 
 ## 🎯 Next Steps
 
-- Add more shadcn/ui components as needed
-- Implement backend integration
-- Add form validation library
-- Enhance animations and transitions
-- Add error handling and loading states
+### 🚀 Backend Development (Ready to Start!)
+Complete backend documentation is available:
+- 📚 **[DOCS_INDEX.md](./DOCS_INDEX.md)** - Start here for navigation
+- 📋 **[BACKEND_REQUIREMENTS.md](./BACKEND_REQUIREMENTS.md)** - Complete specifications
+- ⚡ **[BACKEND_FEATURES_SUMMARY.md](./BACKEND_FEATURES_SUMMARY.md)** - Quick reference
+- ✅ **[BACKEND_CHECKLIST.md](./BACKEND_CHECKLIST.md)** - Development checklist
+- 🤖 **[OPENROUTER_IMPLEMENTATION.md](./OPENROUTER_IMPLEMENTATION.md)** - Multi-LLM integration
+
+**Tech Stack**: Node.js + Express + MongoDB + OpenRouter  
+**Timeline**: 8-10 weeks for MVP  
+**Status**: Specifications complete, ready to implement
+
+### 🔮 Future Enhancements
+- [ ] Real competitor/topic/persona analysis (AI-powered)
+- [ ] Advanced analytics visualization
+- [ ] Multi-language support
+- [ ] Additional regions beyond Global
+- [ ] Unit & integration tests
+
+## 📝 Environment Variables
+
+Currently, no environment variables are required. When backend integration is added, create a `.env` file:
+
+```env
+VITE_API_URL=your_api_url
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
+```
+
+## 🐛 Known Issues
+
+- Google OAuth is currently a placeholder (console log only)
+- Region & Language are fixed to Global/English
+- Dashboard metrics are placeholder values
+- No backend persistence yet
 
 ## 📄 License
 
 MIT License - see LICENSE file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow the existing code style and include tests for new features.
+
+## 📧 Contact
+
+For questions or support, use the "Contact us" link in the application.
